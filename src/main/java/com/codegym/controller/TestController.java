@@ -17,4 +17,9 @@ public class TestController {
     public String post() {
         return "test";
     }
+
+    @PutMapping("/put")
+    public String put() {
+        return "test";
+    }
 }
