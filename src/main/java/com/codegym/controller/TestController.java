@@ -12,5 +12,13 @@ public class TestController {
         return "test";
     }
 
+
+    //Tân
+    @PostMapping("/post")
+    public String post() {
+        return "test";
+    }
+
 //    hoang
+
 }
