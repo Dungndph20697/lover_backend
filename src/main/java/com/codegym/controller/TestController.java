@@ -11,4 +11,10 @@ public class TestController {
     public String get() {
         return "test";
     }
+
+    //Tân
+    @PostMapping("/post")
+    public String post() {
+        return "test";
+    }
 }
