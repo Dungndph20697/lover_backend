@@ -1,16 +1,21 @@
 package com.codegym.model;
 
 import jakarta.persistence.*;
+import lombok.*;
 import jakarta.validation.constraints.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-@Entity
-@Table(name = "users")
-@Data
+import java.time.LocalDateTime;
+
+@Getter
+@Setter
 @AllArgsConstructor
 @NoArgsConstructor
+@ToString
+@Entity
+@Table(name = "users")
 public class User {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -51,7 +56,6 @@ public class User {
 
     @Column(length = 100)
     private String nickname;
-
 
     @ManyToOne
     @JoinColumn(name = "role_id", nullable = false)
