@@ -25,5 +25,11 @@ public class UserController {
         return ResponseEntity.ok(response);
     }
 
+    // Kiểm tra username tồn tại
+    @GetMapping("/exists/{username}")
+    public ResponseEntity<Boolean> checkUsernameExists(@PathVariable String username) {
+        boolean exists = userService.checkUsernameExists(username);
+        return ResponseEntity.ok(exists);
+    }
 
 }
