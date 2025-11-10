@@ -4,18 +4,19 @@ import com.codegym.model.User;
 import com.codegym.service.UserService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.Map;
 
 @RestController
-@RequestMapping("/api/users")
+@RequestMapping("/users/api")
 @RequiredArgsConstructor
-@CrossOrigin(origins = "http://localhost:5173")
 public class UserController {
 
-    private final UserService userService;
+    @Autowired
+    private UserService userService;
 
     // Đăng ký
     @PostMapping("/register")
