@@ -1,7 +1,6 @@
 package com.codegym.model;
 
 import jakarta.persistence.*;
-import org.hibernate.annotations.Type;
 
 import lombok.*;
 
@@ -15,7 +14,7 @@ import lombok.*;
 public class CcdvServiceOption {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Integer id;
+    private Long id;
 
     @OneToOne
     @JoinColumn(name = "user_id", nullable = false)
@@ -26,6 +25,7 @@ public class CcdvServiceOption {
     private String extendedServices;
 
     private Double pricePerHour;
+
     private Float minHours;
 
 }

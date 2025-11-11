@@ -13,13 +13,14 @@ import lombok.*;
 public class ServiceType {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Integer id;
+    private Long id;
 
     private String name;
 
     private String type;
 
     private Double pricePerHour;
+
     private Float minDuration;
 
 }

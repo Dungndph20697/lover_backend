@@ -15,25 +15,32 @@ import java.time.LocalDateTime;
 public class CcdvProfile {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Integer id;
+    private Long id;
 
     @OneToOne
     @JoinColumn(name = "user_id", nullable = false)
     private User user;
 
     private String fullName;
+
     private Integer yearOfBirth;
 
     private String gender;
 
     private String city;
+
     private String nationality;
+
     private String avatar;
+
     private String portrait1;
+
     private String portrait2;
+
     private String portrait3;
 
     private Float height;
+
     private Float weight;
 
     private String hobbies;
@@ -43,7 +50,9 @@ public class CcdvProfile {
     private String requirement;
 
     private String facebookLink;
+
     private LocalDateTime joinDate;
+
     private Integer hireCount;
 
 }
