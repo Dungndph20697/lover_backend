@@ -20,6 +20,7 @@ public class ServiceType {
     private String type;
 
     private Double pricePerHour;
+
     private Float minDuration;
 
 }
