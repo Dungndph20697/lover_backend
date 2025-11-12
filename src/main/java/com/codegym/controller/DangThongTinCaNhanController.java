@@ -6,6 +6,7 @@ import com.codegym.service.CcdvProfileServiceImpl;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -17,6 +18,7 @@ public class DangThongTinCaNhanController {
     private CcdvProfileServiceImpl ccdvProfileService;
 
     @PostMapping(value = "/create", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    @PreAuthorize("isAuthenticated()")
     public ResponseEntity<?> createProfile(@ModelAttribute CcdvProfileDTO dto) {
 
         if (dto.getFullName() == null || dto.getFullName().isBlank()
