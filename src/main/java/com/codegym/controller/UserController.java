@@ -60,12 +60,35 @@ public class UserController {
         return ResponseEntity.ok(response);
     }
 
+    // Kiểm tra email tồn tại
+    @GetMapping("/check-email/{email}")
+    public ResponseEntity<Boolean> checkEmailExists(@PathVariable String email) {
+        boolean exists = userService.checkEmailExists(email);
+        return ResponseEntity.ok(exists);
+    }
+
+    // Kiểm tra phone tồn tại
+    @GetMapping("/check-phone/{phone}")
+    public ResponseEntity<Boolean> checkPhoneExists(@PathVariable String phone) {
+        boolean exists = userService.checkPhoneExists(phone);
+        return ResponseEntity.ok(exists);
+    }
+
+    // Kiểm tra CCCD tồn tại
+    @GetMapping("/check-cccd/{cccd}")
+    public ResponseEntity<Boolean> checkCccdExists(@PathVariable String cccd) {
+        boolean exists = userService.checkCccdExists(cccd);
+        return ResponseEntity.ok(exists);
+    }
+
     // Kiểm tra username tồn tại
     @GetMapping("/exists/{username}")
     public ResponseEntity<Boolean> checkUsernameExists(@PathVariable String username) {
         boolean exists = userService.checkUsernameExists(username);
         return ResponseEntity.ok(exists);
     }
+
+    //
 
     @GetMapping("/me")
     public ResponseEntity<?> getCurrentUser(Authentication authentication) {

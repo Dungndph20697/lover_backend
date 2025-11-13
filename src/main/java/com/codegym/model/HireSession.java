@@ -14,7 +14,7 @@ import lombok.*;
 public class HireSession {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Integer id;
+    private Long id;
 
     // Người thuê
     @ManyToOne
@@ -32,10 +32,13 @@ public class HireSession {
 
     private LocalDateTime startTime;
     private LocalDateTime endTime;
-
     private String status;
-
     private Double totalPrice;
     private LocalDateTime createdAt;
+
+    // Thêm trường mới
+    private String address; // Địa chỉ nơi cung cấp dịch vụ
+    private String userReport; // Báo cáo từ người thuê về buổi thuê
+    private LocalDateTime updatedAt; // Thời gian cập nhật cuối cùng
 
 }
