@@ -107,11 +107,11 @@ public class QuanLiDonThueService {
         quanLiDonThueRepository.save(session);
 
         // Tăng số lần được thuê trong profile
-        Optional<CcdvProfile> profileOpt = ccdvProfileRepository.findByUserId(ccdvId);
-        profileOpt.ifPresent(profile -> {
-            profile.setHireCount(profile.getHireCount() + 1);
-            ccdvProfileRepository.save(profile);
-        });
+//        Optional<CcdvProfile> profileOpt = ccdvProfileRepository.findByUserId(ccdvId);
+//        profileOpt.ifPresent(profile -> {
+//            profile.setHireCount(profile.getHireCount() + 1);
+//            ccdvProfileRepository.save(profile);
+//        });
 
         // --- Gửi tin nhắn cho người thuê ---
         System.out.println("Tin nhắn gửi cho người thuê: Người yêu của bạn đã hoàn thành đơn thuê");
