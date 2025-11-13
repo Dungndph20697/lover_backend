@@ -25,6 +25,7 @@ public class CcdvProfile {
     @Column(name = "full_name", length = 100, nullable = false)
     private String fullName;
 
+
     @Column(name = "year_of_birth")
     private Integer yearOfBirth;
 
@@ -34,25 +35,31 @@ public class CcdvProfile {
     @Column(length = 100)
     private String city;
 
+
     @Column(length = 100)
     private String nationality;
+
 
     @Column(length = 255)
     private String avatar;
 
+
     @Column(length = 255)
     private String portrait1;
+
 
     @Column(length = 255)
     private String portrait2;
 
+
     @Column(length = 255)
     private String portrait3;
 
-    @Column
+
     private Float height;
 
-    @Column
+
+
     private Float weight;
 
     @Column(length = 255)
@@ -67,8 +74,10 @@ public class CcdvProfile {
     @Column(name = "facebook_link", length = 255)
     private String facebookLink;
 
+
     @Column(name = "join_date", nullable = false)
     private LocalDateTime joinDate;
+
 
     @Column(name = "hire_count")
     private Integer hireCount;

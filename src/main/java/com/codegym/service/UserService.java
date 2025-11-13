@@ -57,8 +57,22 @@ public class UserService {
         return userRepository.existsByUsername(username);
     }
 
+    // Kiem tra email tồn tại
+    public boolean checkEmailExists(String email) {
+        return userRepository.existsByEmail(email);
+    }
+
+    // Kiểm tra phone tồn tại
+    public boolean checkPhoneExists(String phone) {
+        return userRepository.existsByPhone(phone);
+    }
+
+    // Kiểm tra cccd tồn tại
+    public boolean checkCccdExists(String cccd) {
+        return userRepository.existsByCccd(cccd);
+    }
+
     public Optional<User> findUserByUsername(String username) {
         return userRepository.findByUsername(username);
     }
-
 }

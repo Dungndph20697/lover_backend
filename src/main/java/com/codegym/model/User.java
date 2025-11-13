@@ -4,10 +4,7 @@ import jakarta.persistence.*;
 import lombok.*;
 import jakarta.validation.constraints.*;
 import lombok.AllArgsConstructor;
-import lombok.Data;
 import lombok.NoArgsConstructor;
-
-import java.time.LocalDateTime;
 
 @Getter
 @Setter
@@ -36,12 +33,12 @@ public class User {
     @Email(message = "email không đúng định dạng")
     private String email;
 
-    @Column(nullable = false, length = 15)
+    @Column(unique = true, nullable = false, length = 15)
     @NotBlank(message = "Số điện thoại không được để trống")
     @Pattern(regexp = "^(0|\\+84)[0-9]{9,10}$", message = "Số điện thoại không hợp lệ")
     private String phone;
 
-    @Column(nullable = false, length = 12)
+    @Column(unique = true, nullable = false, length = 12)
     @NotBlank(message = "Số CCCD không được để trống")
     @Pattern(regexp = "^[0-9]{9,12}$", message = "Số CCCD phải từ 9-12 chữ số")
     private String cccd;

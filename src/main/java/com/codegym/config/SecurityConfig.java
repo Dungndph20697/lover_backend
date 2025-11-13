@@ -43,6 +43,11 @@ public class SecurityConfig {
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/api/users/register", "/api/users/login").permitAll()
+                        .requestMatchers("/api/users/exists/**").permitAll()
+                        .requestMatchers("/api/users/check-email/**").permitAll()
+                        .requestMatchers("/api/users/check-phone/**").permitAll()
+                        .requestMatchers("/api/users/check-cccd/**").permitAll()
+                        .requestMatchers("/api/users/register").permitAll()
                         .requestMatchers("/api/ccdv-profiles/create").hasRole("SERVICE_PROVIDER")
                         .anyRequest().authenticated()
                 )
