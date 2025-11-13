@@ -196,22 +196,81 @@ public class QuanLiDonThueService {
         Map<String, Object> response = new HashMap<>();
         Map<String, Object> stats = new HashMap<>();
 
+        // Lấy tất cả phiên thuê của CCDV
         List<HireSession> allSessions = quanLiDonThueRepository.findByCcdvIdOrderByStartTimeDesc(ccdvId);
 
-        stats.put("pending", allSessions.stream().filter(s -> "PENDING".equals(s.getStatus())).count());
-        stats.put("accepted", allSessions.stream().filter(s -> "ACCEPTED".equals(s.getStatus())).count());
-        stats.put("completed", allSessions.stream().filter(s -> "COMPLETED".equals(s.getStatus())).count());
-        stats.put("reported", allSessions.stream().filter(s -> "REPORTED".equals(s.getStatus())).count());
+        // Thống kê số lượng theo trạng thái
+        long pending = allSessions.stream().filter(s -> "PENDING".equals(s.getStatus())).count();
+        long accepted = allSessions.stream().filter(s -> "ACCEPTED".equals(s.getStatus())).count();
+        long completed = allSessions.stream().filter(s -> "COMPLETED".equals(s.getStatus())).count();
+        long reported = allSessions.stream().filter(s -> "REPORTED".equals(s.getStatus())).count();
 
-        double totalRevenue = allSessions.stream()
+        // Tổng số đơn
+        long tongDon = allSessions.size();
+
+        // Tổng thu nhập (chỉ tính các đơn COMPLETED hoặc REPORTED)
+        double tongThu = allSessions.stream()
                 .filter(s -> "COMPLETED".equals(s.getStatus()) || "REPORTED".equals(s.getStatus()))
                 .mapToDouble(HireSession::getTotalPrice)
                 .sum();
 
-        stats.put("totalRevenue", totalRevenue);
+        // Put dữ liệu vào stats
+        stats.put("tongDon", tongDon);
+        stats.put("tongThu", tongThu);
+        stats.put("pending", pending);
+        stats.put("accepted", accepted);
+        stats.put("completed", completed);
+        stats.put("reported", reported);
 
         response.put("success", true);
         response.put("data", stats);
+
         return response;
     }
+
+    // CHỈNH SỬA PHẢN HỒI VỀ NGƯỜI THUÊ (chỉ khi đơn ở trạng thái COMPLETED)
+    @Transactional
+    public Map<String, Object> updateUserFeedback(Long sessionId, Long ccdvId, String feedback) {
+        Map<String, Object> response = new HashMap<>();
+
+        if (feedback == null || feedback.trim().isEmpty()) {
+            response.put("success", false);
+            response.put("message", "Nội dung phản hồi không được để trống");
+            return response;
+        }
+
+        Optional<HireSession> sessionOpt = quanLiDonThueRepository.findById(sessionId);
+        if (sessionOpt.isEmpty()) {
+            response.put("success", false);
+            response.put("message", "Đơn thuê không tồn tại");
+            return response;
+        }
+
+        HireSession session = sessionOpt.get();
+
+        // Kiểm tra quyền
+        if (!session.getCcdv().getId().equals(ccdvId)) {
+            response.put("success", false);
+            response.put("message", "Bạn không có quyền chỉnh sửa phản hồi của đơn này");
+            return response;
+        }
+
+        // Chỉ cho phép chỉnh sửa khi đơn ở trạng thái COMPLETED
+        if (!"COMPLETED".equals(session.getStatus())) {
+            response.put("success", false);
+            response.put("message", "Chỉ có thể chỉnh sửa phản hồi khi đơn ở trạng thái 'Đã hoàn thành'");
+            return response;
+        }
+
+        // Cập nhật phản hồi
+        session.setUserReport(feedback);
+        session.setUpdatedAt(LocalDateTime.now());
+        quanLiDonThueRepository.save(session);
+
+        response.put("success", true);
+        response.put("message", "Đã cập nhật phản hồi thành công");
+        response.put("data", session);
+        return response;
+    }
+
 }

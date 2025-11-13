@@ -16,7 +16,7 @@ public class QuanLiDonThueController {
     private final QuanLiDonThueService quanLiDonThueService;
     private final EmailService emailService;
 
-    // ✅ Endpoint test gửi email (chỉ để test trên Postman)
+    // Endpoint test gửi email (chỉ để test trên Postman)
     @PostMapping("/test-email")
     public ResponseEntity<Map<String, Object>> testSendEmail(
             @RequestParam String to,
@@ -82,6 +82,16 @@ public class QuanLiDonThueController {
             @RequestBody Map<String, String> payload) {
         String report = payload.get("report");
         return ResponseEntity.ok(quanLiDonThueService.reportClient(sessionId, ccdvId, report));
+    }
+
+    // Chỉnh sửa phản hồi về người thuê (chỉ khi đơn ở trạng thái COMPLETED)
+    @PutMapping("/{sessionId}/feedback")
+    public ResponseEntity<Map<String, Object>> updateFeedback(
+            @PathVariable Long sessionId,
+            @RequestParam Long ccdvId,
+            @RequestBody Map<String, String> payload) {
+        String feedback = payload.get("feedback");
+        return ResponseEntity.ok(quanLiDonThueService.updateUserFeedback(sessionId, ccdvId, feedback));
     }
 
     // Lấy chi tiết đơn
