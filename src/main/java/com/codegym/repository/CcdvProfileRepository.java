@@ -1,13 +1,13 @@
 package com.codegym.repository;
 
+import com.codegym.dto.CcdvProfileDTO;
 import com.codegym.model.CcdvProfile;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.List;
 import java.util.Optional;
 
-public interface CcdvProfileRepository extends JpaRepository<CcdvProfile, Integer> {
-
+public interface CcdvProfileRepository extends JpaRepository<CcdvProfile, Long> {
     // Tìm profile theo user_id
     Optional<CcdvProfile> findByUserId(Long userId);
 
@@ -28,5 +28,5 @@ public interface CcdvProfileRepository extends JpaRepository<CcdvProfile, Intege
 
     // Tìm CCDV mới tham gia
     List<CcdvProfile> findTop10ByOrderByJoinDateDesc();
-    boolean existsByUserId(Integer userId);
+//    CcdvProfile findByUserId(Long userId);
 }
