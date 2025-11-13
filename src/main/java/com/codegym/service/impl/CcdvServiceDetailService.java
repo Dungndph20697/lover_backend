@@ -7,10 +7,13 @@ import com.codegym.repository.CcdvServiceDetailRepository;
 import com.codegym.repository.ServiceTypeRepository;
 import com.codegym.repository.UserRepository;
 import com.codegym.service.ICcdvServiceDetailService;
+import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 
 @Service
@@ -25,29 +28,31 @@ public class CcdvServiceDetailService implements ICcdvServiceDetailService {
     @Autowired
     private UserRepository userRepo;
 
-
+    /**
+     * Lưu danh sách dịch vụ mà user đăng ký
+     */
     @Override
     public void saveServicesForUser(Long userId, List<Long> serviceIds) {
         User user = userRepo.findById(userId)
                 .orElseThrow(() -> new RuntimeException("User not found"));
 
-        // Danh sách dịch vụ mà user hiện có
-        List<CcdvServiceDetail> existingDetails = detailRepo.findByUserId(userId);
+        // Danh sách dịch vụ hiện có của user
+        List<CcdvServiceDetail> existingDetails = detailRepo.findByUser_Id(userId);
         List<Long> existingServiceIds = existingDetails.stream()
                 .map(detail -> detail.getServiceType().getId())
                 .toList();
 
-        // Danh sách BASIC luôn mặc định giữ lại
+        // Lấy danh sách dịch vụ BASIC mặc định
         List<ServiceType> basicServices = serviceRepo.findAll()
                 .stream()
                 .filter(sv -> "BASIC".equalsIgnoreCase(sv.getType()))
                 .toList();
 
-        // Danh sách dịch vụ được chọn mới (FREE + EXTENDED)
+        // Lấy danh sách dịch vụ được chọn (FREE + EXTENDED)
         List<ServiceType> selectedServices = serviceRepo.findAllById(serviceIds);
 
-        // Gộp tất cả dịch vụ cần có sau khi lưu
-        List<Long> finalServiceIds = new java.util.ArrayList<>();
+        // Gộp danh sách dịch vụ cuối cùng
+        List<Long> finalServiceIds = new ArrayList<>();
         basicServices.forEach(sv -> finalServiceIds.add(sv.getId()));
         selectedServices.forEach(sv -> finalServiceIds.add(sv.getId()));
 
@@ -66,7 +71,7 @@ public class CcdvServiceDetailService implements ICcdvServiceDetailService {
             }
         }
 
-        // ✅ Xóa dịch vụ mà user bỏ tích (ngoại trừ BASIC)
+        // ✅ Xóa dịch vụ mà user bỏ tích (trừ BASIC)
         for (CcdvServiceDetail detail : existingDetails) {
             Long id = detail.getServiceType().getId();
             if (!finalServiceIds.contains(id)
@@ -76,8 +81,30 @@ public class CcdvServiceDetailService implements ICcdvServiceDetailService {
         }
     }
 
+    /**
+     * Lấy danh sách dịch vụ theo user
+     */
     public List<CcdvServiceDetail> getServicesByUser(Long userId) {
-        return detailRepo.findByUserId(userId);
+        return detailRepo.findByUser_Id(userId);
+    }
+
+    /**
+     * Cập nhật giá dịch vụ mở rộng và basic cho user
+     */
+    public void updateUserServicePrice(Long userId, Long serviceId, BigDecimal newPrice) {
+        CcdvServiceDetail detail = detailRepo.findByUser_Id(userId)
+                .stream()
+                .filter(d -> d.getServiceType().getId().equals(serviceId))
+                .findFirst()
+                .orElseThrow(() -> new RuntimeException("Không tìm thấy dịch vụ này cho người dùng."));
+
+        String type = detail.getServiceType().getType();
+
+        if ("FREE".equalsIgnoreCase(type)) {
+            throw new RuntimeException("Không thể cập nhật giá cho dịch vụ miễn phí!");
+        }
+
+        detailRepo.updatePriceByUserAndService(userId, serviceId, newPrice);
     }
 
 }
