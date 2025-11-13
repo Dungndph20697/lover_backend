@@ -27,5 +27,5 @@ public class CcdvProfileDTO {
     private MultipartFile portrait2;
     private MultipartFile portrait3;
 
-    private Integer userId;
+    private Long userId;
 }
