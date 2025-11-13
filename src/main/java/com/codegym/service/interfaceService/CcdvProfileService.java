@@ -8,4 +8,6 @@ import java.io.IOException;
 
 public interface CcdvProfileService {
     CcdvProfile saveProfile(CcdvProfileDTO dto) throws IOException;
+    CcdvProfile findByUserId(Long userId);
+    CcdvProfile updateProfile(Long profileId, CcdvProfileDTO dto) throws IOException;
 }

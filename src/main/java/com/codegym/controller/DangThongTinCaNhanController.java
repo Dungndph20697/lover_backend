@@ -41,4 +41,34 @@ public class DangThongTinCaNhanController {
             return ResponseEntity.internalServerError().body("Lỗi khi lưu thông tin");
         }
     }
+
+    @GetMapping("/user/{userId}")
+    @PreAuthorize("isAuthenticated()")
+    public ResponseEntity<?> getProfileByUserId(@PathVariable("userId") Long userId) {
+        try {
+            CcdvProfile profile = ccdvProfileService.findByUserId(userId);
+            if (profile == null) {
+                return ResponseEntity.notFound().build();
+            }
+            return ResponseEntity.ok(profile);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return ResponseEntity.internalServerError().body("Lỗi khi lấy thông tin người dùng");
+        }
+    }
+
+    @PutMapping(value = "/update/{profileId}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    @PreAuthorize("isAuthenticated()")
+    public ResponseEntity<?> updateProfile(
+            @PathVariable("profileId") Long profileId,
+            @ModelAttribute CcdvProfileDTO dto
+    ) {
+        try {
+            CcdvProfile updated = ccdvProfileService.updateProfile(profileId, dto);
+            return ResponseEntity.ok(updated);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return ResponseEntity.internalServerError().body("Lỗi khi cập nhật hồ sơ");
+        }
+    }
 }
