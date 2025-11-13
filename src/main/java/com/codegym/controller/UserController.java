@@ -6,7 +6,6 @@ import com.codegym.service.UserService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -15,7 +14,6 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.HashMap;
 import java.util.Map;
 
 @CrossOrigin(origins = "http://localhost:5173")
@@ -62,12 +60,35 @@ public class UserController {
         return ResponseEntity.ok(response);
     }
 
+    // Kiểm tra email tồn tại
+    @GetMapping("/check-email/{email}")
+    public ResponseEntity<Boolean> checkEmailExists(@PathVariable String email) {
+        boolean exists = userService.checkEmailExists(email);
+        return ResponseEntity.ok(exists);
+    }
+
+    // Kiểm tra phone tồn tại
+    @GetMapping("/check-phone/{phone}")
+    public ResponseEntity<Boolean> checkPhoneExists(@PathVariable String phone) {
+        boolean exists = userService.checkPhoneExists(phone);
+        return ResponseEntity.ok(exists);
+    }
+
+    // Kiểm tra CCCD tồn tại
+    @GetMapping("/check-cccd/{cccd}")
+    public ResponseEntity<Boolean> checkCccdExists(@PathVariable String cccd) {
+        boolean exists = userService.checkCccdExists(cccd);
+        return ResponseEntity.ok(exists);
+    }
+
     // Kiểm tra username tồn tại
     @GetMapping("/exists/{username}")
     public ResponseEntity<Boolean> checkUsernameExists(@PathVariable String username) {
         boolean exists = userService.checkUsernameExists(username);
         return ResponseEntity.ok(exists);
     }
+
+    //
 
     @GetMapping("/me")
     public ResponseEntity<?> getCurrentUser(Authentication authentication) {
