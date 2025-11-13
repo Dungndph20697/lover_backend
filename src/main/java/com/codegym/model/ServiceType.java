@@ -3,6 +3,9 @@ package com.codegym.model;
 import jakarta.persistence.*;
 import lombok.*;
 
+import java.math.BigDecimal;
+import java.time.LocalDateTime;
+
 @Getter
 @Setter
 @AllArgsConstructor
@@ -19,8 +22,6 @@ public class ServiceType {
 
     private String type;
 
-    private Double pricePerHour;
-
-    private Float minDuration;
+    private BigDecimal pricePerHour;
 
 }

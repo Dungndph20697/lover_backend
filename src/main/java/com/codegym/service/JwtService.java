@@ -14,7 +14,7 @@ import java.util.Date;
 public class JwtService {
 
     private static final String SECRET_KEY = "12345678901234567890123456789012"; // ít nhất 32 ký tự
-    private static final long EXPIRATION_TIME = 86400000; // 1 ngày
+    private static final long EXPIRATION_TIME = 24 *60 * 60 * 1000; // 30 phút
 
     private final Key key = Keys.hmacShaKeyFor(SECRET_KEY.getBytes());
 
