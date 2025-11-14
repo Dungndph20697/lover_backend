@@ -49,6 +49,7 @@ public class SecurityConfig {
                         .requestMatchers("/api/users/check-cccd/**").permitAll()
                         .requestMatchers("/api/users/register").permitAll()
                         .requestMatchers("/api/ccdv-profiles/create").hasRole("SERVICE_PROVIDER")
+                        .requestMatchers("/api/ccdv/**").hasRole("SERVICE_PROVIDER")
                         .anyRequest().authenticated()
                 )
                 .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class);
