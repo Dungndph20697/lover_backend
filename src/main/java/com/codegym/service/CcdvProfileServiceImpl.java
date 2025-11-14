@@ -5,6 +5,7 @@ import com.cloudinary.utils.ObjectUtils;
 import com.codegym.dto.CcdvProfileDTO;
 import com.codegym.model.CcdvProfile;
 import com.codegym.model.User;
+import com.codegym.model.enums.ProfileStatus;
 import com.codegym.repository.CcdvProfileRepository;
 import com.codegym.repository.UserRepository;
 import com.codegym.service.interfaceService.CcdvProfileService;
@@ -106,6 +107,21 @@ public class CcdvProfileServiceImpl implements CcdvProfileService {
                 ObjectUtils.asMap("resource_type", "auto"));
 
         return (String) uploadResult.get("secure_url");
+    }
+
+    // Chuyển trạng thái ACTIVE <-> INACTIVE
+
+    public CcdvProfile toggleStatus(Long userId) {
+        CcdvProfile profile = ccdvProfileRepository.findByUserId(userId);
+        if (profile == null) {
+            throw new RuntimeException("Không tìm thấy hồ sơ CCDV của userId: " + userId);
+        }
+        if (profile.getStatus() == ProfileStatus.ACTIVE) {
+            profile.setStatus(ProfileStatus.INACTIVE);
+        } else {
+            profile.setStatus(ProfileStatus.ACTIVE);
+        }
+        return ccdvProfileRepository.save(profile);
     }
 }
 

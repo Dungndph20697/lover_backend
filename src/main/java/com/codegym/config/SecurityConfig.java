@@ -48,11 +48,9 @@ public class SecurityConfig {
                         .requestMatchers("/api/users/check-phone/**").permitAll()
                         .requestMatchers("/api/users/check-cccd/**").permitAll()
                         .requestMatchers("/api/users/register").permitAll()
-                        // Test email endpoints
-                        .requestMatchers("/api/ccdv/hire-sessions/test-email").permitAll()
-                        .requestMatchers("/api/ccdv/hire-sessions/test-email-html").permitAll()
-                        // Hire sessions endpoints
-                        .requestMatchers("/api/ccdv/hire-sessions/**").permitAll()
+                        .requestMatchers("/api/ccdv-profiles/user/**").hasRole("SERVICE_PROVIDER")
+                        .requestMatchers("/api/ccdv-profiles/update/**").hasRole("SERVICE_PROVIDER")
+                        .requestMatchers("/api/ccdv-profiles/toggle-status/**").hasRole("SERVICE_PROVIDER")
                         .requestMatchers("/api/ccdv-profiles/create").hasRole("SERVICE_PROVIDER")
                         .anyRequest().authenticated()
                 )
