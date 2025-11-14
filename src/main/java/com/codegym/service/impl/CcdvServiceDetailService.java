@@ -29,12 +29,13 @@ public class CcdvServiceDetailService implements ICcdvServiceDetailService {
     private UserRepository userRepo;
 
     /**
-     * Lưu danh sách dịch vụ mà user đăng ký
+     * ✅ Lưu danh sách dịch vụ mà user đăng ký (tự động thêm BASIC, tránh trùng lặp)
      */
     @Override
+    @Transactional
     public void saveServicesForUser(Long userId, List<Long> serviceIds) {
         User user = userRepo.findById(userId)
-                .orElseThrow(() -> new RuntimeException("User not found"));
+                .orElseThrow(() -> new RuntimeException("Không tìm thấy user với ID: " + userId));
 
         // Danh sách dịch vụ hiện có của user
         List<CcdvServiceDetail> existingDetails = detailRepo.findByUser_Id(userId);
@@ -42,25 +43,25 @@ public class CcdvServiceDetailService implements ICcdvServiceDetailService {
                 .map(detail -> detail.getServiceType().getId())
                 .toList();
 
-        // Lấy danh sách dịch vụ BASIC mặc định
+        // ✅ Lấy danh sách dịch vụ BASIC mặc định
         List<ServiceType> basicServices = serviceRepo.findAll()
                 .stream()
                 .filter(sv -> "BASIC".equalsIgnoreCase(sv.getType()))
                 .toList();
 
-        // Lấy danh sách dịch vụ được chọn (FREE + EXTENDED)
+        // ✅ Lấy danh sách dịch vụ được chọn (FREE + EXTENDED)
         List<ServiceType> selectedServices = serviceRepo.findAllById(serviceIds);
 
-        // Gộp danh sách dịch vụ cuối cùng
+        // ✅ Gộp danh sách dịch vụ cuối cùng
         List<Long> finalServiceIds = new ArrayList<>();
         basicServices.forEach(sv -> finalServiceIds.add(sv.getId()));
         selectedServices.forEach(sv -> finalServiceIds.add(sv.getId()));
 
-        // ✅ Thêm dịch vụ mới chưa có
+        // ✅ Thêm dịch vụ mới (nếu chưa tồn tại)
         for (Long serviceId : finalServiceIds) {
-            if (!existingServiceIds.contains(serviceId)) {
+            if (!detailRepo.existsByUserAndService(userId, serviceId)) {
                 ServiceType st = serviceRepo.findById(serviceId)
-                        .orElseThrow(() -> new RuntimeException("Service not found"));
+                        .orElseThrow(() -> new RuntimeException("Không tìm thấy dịch vụ với ID: " + serviceId));
                 CcdvServiceDetail detail = new CcdvServiceDetail();
                 detail.setServiceType(st);
                 detail.setUser(user);
@@ -82,15 +83,18 @@ public class CcdvServiceDetailService implements ICcdvServiceDetailService {
     }
 
     /**
-     * Lấy danh sách dịch vụ theo user
+     * ✅ Lấy danh sách dịch vụ theo user
      */
+    @Override
     public List<CcdvServiceDetail> getServicesByUser(Long userId) {
         return detailRepo.findByUser_Id(userId);
     }
 
     /**
-     * Cập nhật giá dịch vụ mở rộng và basic cho user
+     * ✅ Cập nhật giá dịch vụ mở rộng hoặc cơ bản
      */
+
+    @Transactional
     public void updateUserServicePrice(Long userId, Long serviceId, BigDecimal newPrice) {
         CcdvServiceDetail detail = detailRepo.findByUser_Id(userId)
                 .stream()
@@ -106,5 +110,4 @@ public class CcdvServiceDetailService implements ICcdvServiceDetailService {
 
         detailRepo.updatePriceByUserAndService(userId, serviceId, newPrice);
     }
-
 }

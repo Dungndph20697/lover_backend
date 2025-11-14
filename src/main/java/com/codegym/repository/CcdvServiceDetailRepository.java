@@ -17,6 +17,8 @@ public interface CcdvServiceDetailRepository extends JpaRepository<CcdvServiceDe
 
     List<CcdvServiceDetail> findByUser_Id(Long userId);
 
+    @Query("SELECT COUNT(c) > 0 FROM CcdvServiceDetail c WHERE c.user.id = :userId AND c.serviceType.id = :serviceId")
+    boolean existsByUserAndService(Long userId, Long serviceId);
     // thêm sửa giá dịch vụ mở rộng theo id user
     @Transactional
     @Modifying(clearAutomatically = true)

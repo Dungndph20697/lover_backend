@@ -30,16 +30,23 @@ public class CcdvServiceDetailController {
     public ResponseEntity<?> saveUserServices(
             @PathVariable Long userId,
             @RequestBody Map<String, Object> payload) {
+
         try {
+            // ✅ Đảm bảo payload có key "serviceIds"
+            if (payload == null || !payload.containsKey("serviceIds")) {
+                return ResponseEntity
+                        .badRequest()
+                        .body("⚠️ Thiếu danh sách serviceIds trong request body!");
+            }
+
             List<Long> serviceIds = ((List<?>) payload.get("serviceIds"))
                     .stream()
                     .map(id -> Long.valueOf(id.toString()))
                     .toList();
 
             serviceDetailService.saveServicesForUser(userId, serviceIds);
-            return ResponseEntity
-                    .status(HttpStatus.OK)
-                    .body("✅ Dịch vụ đã được lưu thành công (bao gồm cả BASIC mặc định).");
+
+            return ResponseEntity.ok("✅ Dịch vụ đã được lưu thành công (bao gồm cả BASIC mặc định).");
         } catch (Exception e) {
             return ResponseEntity
                     .status(HttpStatus.BAD_REQUEST)
@@ -54,9 +61,6 @@ public class CcdvServiceDetailController {
     public ResponseEntity<?> getUserServices(@PathVariable Long userId) {
         try {
             List<CcdvServiceDetail> details = serviceDetailService.getServicesByUser(userId);
-            if (details.isEmpty()) {
-                return ResponseEntity.ok(Collections.emptyList());
-            }
             return ResponseEntity.ok(details);
         } catch (Exception e) {
             return ResponseEntity
@@ -66,20 +70,25 @@ public class CcdvServiceDetailController {
     }
 
     /**
-     * 💰 Cập nhật giá dịch vụ mở rộng và basic cho user cụ thể
+     * 💰 Cập nhật giá dịch vụ (BASIC hoặc EXTENDED)
      */
     @PutMapping("/update-price")
     public ResponseEntity<?> updatePrice(@RequestBody Map<String, Object> payload) {
         try {
+            // ✅ Kiểm tra payload
+            if (payload == null || !payload.containsKey("userId") || !payload.containsKey("serviceId") || !payload.containsKey("price")) {
+                return ResponseEntity
+                        .badRequest()
+                        .body("⚠️ Thiếu thông tin userId, serviceId hoặc price trong request body!");
+            }
+
             Long userId = Long.valueOf(payload.get("userId").toString());
             Long serviceId = Long.valueOf(payload.get("serviceId").toString());
             BigDecimal price = new BigDecimal(payload.get("price").toString());
 
             serviceDetailService.updateUserServicePrice(userId, serviceId, price);
 
-            return ResponseEntity
-                    .status(HttpStatus.OK)
-                    .body("✅ Cập nhật giá dịch vụ thành công cho người dùng!");
+            return ResponseEntity.ok("✅ Cập nhật giá dịch vụ thành công!");
         } catch (Exception e) {
             return ResponseEntity
                     .status(HttpStatus.BAD_REQUEST)
