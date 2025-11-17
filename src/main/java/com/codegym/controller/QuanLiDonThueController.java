@@ -1,25 +1,17 @@
 package com.codegym.controller;
 
-<<<<<<< HEAD
 import com.codegym.service.EmailNotificationService;
-=======
-import com.codegym.model.HireSession;
-import com.codegym.repository.QuanLiDonThueRepository;
-import com.codegym.service.EmailService;
->>>>>>> 92c2565 (luu trang thai)
 import com.codegym.service.QuanLiDonThueService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.List;
 import java.util.Map;
 
 @RestController
 @RequestMapping("/api/ccdv/hire-sessions")
 @RequiredArgsConstructor
 public class QuanLiDonThueController {
-    private final QuanLiDonThueRepository hireSessionRepository;
     private final QuanLiDonThueService quanLiDonThueService;
     private final EmailNotificationService emailNotificationService;
 
