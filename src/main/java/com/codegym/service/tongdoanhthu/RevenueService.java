@@ -1,11 +1,6 @@
 package com.codegym.service.tongdoanhthu;
 
-import com.codegym.dto.RevenuePerDayDTO;
-
 import java.time.LocalDateTime;
-import java.time.YearMonth;
-import java.util.List;
-import java.util.Map;
 
 public interface RevenueService {
 

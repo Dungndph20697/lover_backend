@@ -1,6 +1,5 @@
 package com.codegym.service.tongdoanhthu;
 
-import com.codegym.model.HireSession;
 import com.codegym.model.User;
 import com.codegym.repository.TongDoanhThuRepository;
 import com.codegym.service.UserService;
@@ -12,11 +11,6 @@ import org.springframework.stereotype.Service;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.YearMonth;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.stream.Collectors;
-import java.util.TreeMap;
 
 @Service
 public class RevenueServiceImpl implements RevenueService {

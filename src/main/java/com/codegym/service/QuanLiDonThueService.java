@@ -286,4 +286,18 @@ public class QuanLiDonThueService {
         return response;
     }
 
+    public Map<String, Object> getAllSessions() {
+        Map<String, Object> response = new HashMap<>();
+
+        try {
+            List<HireSession> sessions = quanLiDonThueRepository.findAll();
+            response.put("success", true);
+            response.put("data", sessions);
+            return response;
+        } catch (Exception e) {
+            response.put("success", false);
+            response.put("message", "Lỗi khi lấy danh sách: " + e.getMessage());
+            return response;
+        }
+    }
 }
