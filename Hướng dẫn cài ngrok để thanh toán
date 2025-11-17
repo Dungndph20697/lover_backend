@@ -1,0 +1,11 @@
+https://dashboard.ngrok.com/get-started/setup
+
+- chọn hệ điều hành
+- tải về theo hướng dẫn
+- dòng thứ 3
+- ngrok http 8080
+
+ví dụ:
+- copy: Forwarding https://terrenely-nonornamental-bobette.ngrok-free.dev -> http://localhost:8080
+
+- dán vào webhook của sepay.

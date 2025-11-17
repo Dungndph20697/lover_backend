@@ -88,7 +88,6 @@ public class UserController {
         return ResponseEntity.ok(exists);
     }
 
-    //
 
     @GetMapping("/me")
     public ResponseEntity<?> getCurrentUser(Authentication authentication) {
@@ -97,7 +96,16 @@ public class UserController {
         }
 
         String username = authentication.getName();
-        User user = userService.findUserByUsername(username).get();
+
+        User user = userService.findUserByUsername(username)
+                .orElseThrow(() -> new RuntimeException("User không tồn tại"));
+
+        //  Nếu user chưa có mã nạp tiền → tạo ngay
+        if (user.getTopupCode() == null || user.getTopupCode().trim().isEmpty()) {
+            String topupCode = "C0525G1" + user.getId();  // Mã gọn nhẹ
+            user.setTopupCode(topupCode);
+            userService.save(user); // Lưu lại DB
+        }
 
         return ResponseEntity.ok(user);
     }

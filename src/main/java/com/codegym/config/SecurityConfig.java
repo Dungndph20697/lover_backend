@@ -48,10 +48,16 @@ public class SecurityConfig {
                         .requestMatchers("/api/users/check-phone/**").permitAll()
                         .requestMatchers("/api/users/check-cccd/**").permitAll()
                         .requestMatchers("/api/users/register").permitAll()
+                        .requestMatchers("/api/sepay/webhook").permitAll()
+
+                        .requestMatchers("/api/ccdv-profiles/create").hasRole("SERVICE_PROVIDER")
                         .requestMatchers("/api/ccdv-profiles/user/**").hasRole("SERVICE_PROVIDER")
                         .requestMatchers("/api/ccdv-profiles/update/**").hasRole("SERVICE_PROVIDER")
                         .requestMatchers("/api/ccdv-profiles/toggle-status/**").hasRole("SERVICE_PROVIDER")
-                        .requestMatchers("/api/ccdv-profiles/create").hasRole("SERVICE_PROVIDER")
+                        .requestMatchers("/api/wallet/topup").hasAnyRole("USER", "SERVICE_PROVIDER")
+                        .requestMatchers("/api/wallet/balance").hasAnyRole("USER", "SERVICE_PROVIDER")
+                        .requestMatchers("/api/sepay/webhook").permitAll()
+
                         .anyRequest().authenticated()
                 )
                 .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class);
