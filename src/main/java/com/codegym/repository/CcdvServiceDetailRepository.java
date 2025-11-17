@@ -26,4 +26,6 @@ public interface CcdvServiceDetailRepository extends JpaRepository<CcdvServiceDe
             "WHERE c.user.id = :userId AND c.serviceType.id = :serviceId " +
             "AND UPPER(c.serviceType.type) <> 'FREE'")
     void updatePriceByUserAndService(Long userId, Long serviceId, BigDecimal price);
+
+    List<CcdvServiceDetail> findByIdIn(Iterable<Long> ids);
 }
