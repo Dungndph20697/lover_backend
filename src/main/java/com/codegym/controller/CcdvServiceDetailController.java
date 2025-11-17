@@ -9,7 +9,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.math.BigDecimal;
-import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
@@ -28,7 +27,7 @@ public class CcdvServiceDetailController {
      */
     @PostMapping("/save/{userId}")
     public ResponseEntity<?> saveUserServices(
-            @PathVariable Long userId,
+            @PathVariable("userId") Long userId,
             @RequestBody Map<String, Object> payload) {
 
         try {
@@ -58,7 +57,7 @@ public class CcdvServiceDetailController {
      * 🔍 Lấy danh sách dịch vụ mà user đã đăng ký
      */
     @GetMapping("/user/{userId}")
-    public ResponseEntity<?> getUserServices(@PathVariable Long userId) {
+    public ResponseEntity<?> getUserServices(@PathVariable("userId") Long userId) {
         try {
             List<CcdvServiceDetail> details = serviceDetailService.getServicesByUser(userId);
             return ResponseEntity.ok(details);
