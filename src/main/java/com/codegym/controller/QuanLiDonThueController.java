@@ -1,5 +1,6 @@
 package com.codegym.controller;
 
+import com.codegym.model.HireSession;
 import com.codegym.service.EmailNotificationService;
 import com.codegym.service.QuanLiDonThueService;
 import lombok.RequiredArgsConstructor;

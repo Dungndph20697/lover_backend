@@ -300,4 +300,24 @@ public class QuanLiDonThueService {
             return response;
         }
     }
+
+    public void completeHire(Long hireSessionId) {
+        HireSession session = quanLiDonThueRepository.findById(hireSessionId)
+                .orElseThrow(() -> new RuntimeException("Hire session not found"));
+
+        session.setStatus("DONE");
+        quanLiDonThueRepository.save(session);
+
+        Optional<CcdvProfile> profileOpt = Optional.ofNullable(
+                ccdvProfileRepository.findByUserId(session.getCcdv().getId()) // userId
+        );
+        profileOpt.ifPresent(profile -> {
+            if (profile.getHireCount() == null) {
+                profile.setHireCount(1);
+            } else {
+                profile.setHireCount(profile.getHireCount() + 1);
+            }
+            ccdvProfileRepository.save(profile);
+        });
+    }
 }
