@@ -12,7 +12,6 @@ import org.springframework.data.repository.query.Param;
 
 import java.util.List;
 
-@Repository
 public interface QuanLiDonThueRepository extends JpaRepository<HireSession, Long> {
     
     // Lấy danh sách đơn thuê theo CCDV
