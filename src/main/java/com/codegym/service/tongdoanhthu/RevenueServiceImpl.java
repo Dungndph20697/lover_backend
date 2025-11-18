@@ -1,7 +1,9 @@
 package com.codegym.service.tongdoanhthu;
 
+import com.codegym.model.CcdvProfile;
 import com.codegym.model.HireSession;
 import com.codegym.model.User;
+import com.codegym.repository.CcdvProfileRepository;
 import com.codegym.repository.TongDoanhThuRepository;
 import com.codegym.service.UserService;
 
@@ -12,6 +14,7 @@ import org.springframework.stereotype.Service;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.YearMonth;
+import java.time.temporal.WeekFields;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -28,6 +31,8 @@ public class RevenueServiceImpl implements RevenueService {
 
     @Autowired
     private PasswordEncoder passwordEncoder;
+    @Autowired
+    private CcdvProfileRepository ccdvProfileRepository;
 
     @Autowired
     public RevenueServiceImpl(UserService userService,
@@ -75,5 +80,55 @@ public class RevenueServiceImpl implements RevenueService {
                 .orElseThrow(() -> new RuntimeException("User không tồn tại"));
 
         return repository.sumRevenueByCcdvAndDateRange(user.getId(), start, end);
+    }
+
+    @Override
+    public Map<Integer, Double> revenueByWeek(String username, LocalDateTime from, LocalDateTime to) {
+        User user = userService.findUserByUsername(username)
+                .orElseThrow(() -> new RuntimeException("User không tồn tại"));
+
+        List<HireSession> sessions = repository.findDoneSessionsByCcdvInRange(user.getId(), from, to);
+
+        Map<Integer, Double> weekRevenue = new TreeMap<>();
+        WeekFields weekFields = WeekFields.ISO; // Monday = 1
+
+        for (HireSession s : sessions) {
+            LocalDate date = s.getStartTime().toLocalDate();
+            int weekNumber = date.get(weekFields.weekOfWeekBasedYear());
+            weekRevenue.merge(weekNumber, s.getTotalPrice(), Double::sum);
+        }
+
+        return weekRevenue;
+    }
+
+    @Override
+    public Map<Integer, Double> revenueByMonth(String username, LocalDateTime from, LocalDateTime to) {
+        User user = userService.findUserByUsername(username)
+                .orElseThrow(() -> new RuntimeException("User không tồn tại"));
+
+        List<HireSession> sessions = repository.findDoneSessionsByCcdvInRange(user.getId(), from, to);
+
+        Map<Integer, Double> monthRevenue = new TreeMap<>();
+        for (HireSession s : sessions) {
+            int month = s.getStartTime().getMonthValue();
+            monthRevenue.merge(month, s.getTotalPrice(), Double::sum);
+        }
+
+        return monthRevenue;
+    }
+
+    @Override
+    public Map<LocalDate, Double> revenueByDay(String username, LocalDateTime start, LocalDateTime end) {
+        User user = userService.findUserByUsername(username)
+                .orElseThrow(() -> new RuntimeException("User không tồn tại"));
+        List<HireSession> sessions = repository.findDoneSessionsByCcdvInRangeSafe(user.getId(), start, end);
+        System.out.println("Logged in user id = " + user.getId());
+        // Group theo ngày kết thúc
+        Map<LocalDate, Double> dayRevenue = new TreeMap<>();
+        for (HireSession s : sessions) {
+            LocalDate date = s.getEndTime().toLocalDate(); // tính theo ngày kết thúc
+            dayRevenue.merge(date, s.getTotalPrice(), Double::sum);
+        }
+        return dayRevenue;
     }
 }
