@@ -55,6 +55,7 @@ public class SecurityConfig {
                         .requestMatchers("/api/ccdv/hire-sessions/**").permitAll()
                         .requestMatchers("/api/ccdv-profiles/create").hasRole("SERVICE_PROVIDER")
                         .requestMatchers("/api/revenue/**").permitAll()
+                        .requestMatchers("/api/users/top-ccdv-view").permitAll()
                         .anyRequest().authenticated()
                 )
                 .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class);
