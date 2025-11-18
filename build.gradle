@@ -56,8 +56,13 @@ dependencies {
 	//-- Cloud --
 	implementation 'com.cloudinary:cloudinary-http44:1.30.0'
 
+
+	//websocket
+	implementation 'org.springframework.boot:spring-boot-starter-websocket'
+
     // google
     implementation 'com.google.code.gson:gson:2.10.1'
+
 
 }
 

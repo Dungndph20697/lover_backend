@@ -4,12 +4,12 @@ import jakarta.persistence.*;
 import lombok.*;
 import java.time.LocalDateTime;
 
-@Entity
 @Getter
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
+@Entity
 @Table(name = "messages")
 public class Message {
     @Id
@@ -30,6 +30,6 @@ public class Message {
     @Column(name = "timestamp", nullable = false, columnDefinition = "DATETIME(6)")
     private LocalDateTime timestamp;
 
-    @Column(name = "order_id", nullable = false)
-    private Long orderId; // Liên kết với đơn cụ thể
+//    @Column(name = "order_id", nullable = true)
+//    private Long orderId; // Liên kết với đơn cụ thể
 }

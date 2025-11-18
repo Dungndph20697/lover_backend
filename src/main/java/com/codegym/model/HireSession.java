@@ -28,10 +28,6 @@ public class HireSession {
     @JoinColumn(name = "ccdv_id", nullable = false)
     private User ccdv;
 
-//    @ManyToOne
-//    @JoinColumn(name = "service_id", nullable = false)
-//    private ServiceType serviceType;
-
     @Column(name = "start_time", nullable = false)
     private LocalDateTime startTime;
 

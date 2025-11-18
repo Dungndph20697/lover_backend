@@ -2,6 +2,7 @@ package com.codegym.config;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
@@ -42,6 +43,7 @@ public class SecurityConfig {
                 .cors(cors -> cors.configurationSource(corsConfigurationSource()))
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(auth -> auth
+                        .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
                         .requestMatchers("/api/users/register", "/api/users/login").permitAll()
                         .requestMatchers("/api/users/exists/**").permitAll()
                         .requestMatchers("/api/users/check-email/**").permitAll()
@@ -50,7 +52,17 @@ public class SecurityConfig {
                         .requestMatchers("/api/users/service/**").permitAll()
                         .requestMatchers("/api/users/check-cccd/**").permitAll()
                         .requestMatchers("/api/users/register").permitAll()
+
+                        // Test email endpoints
+                        .requestMatchers("/api/ccdv/hire-sessions/test-email").permitAll()
+                        .requestMatchers("/api/ccdv/hire-sessions/test-email-html").permitAll()
+                        // Hire sessions endpoints
+                        .requestMatchers("/api/ccdv/hire-sessions/**").permitAll()
+                        .requestMatchers("/ws/**").permitAll()
+                        .requestMatchers("/api/messages/**").permitAll()
+
                         .requestMatchers("/api/sepay/webhook").permitAll()
+
 
                         .requestMatchers("/api/ccdv-profiles/create").hasRole("SERVICE_PROVIDER")
 
