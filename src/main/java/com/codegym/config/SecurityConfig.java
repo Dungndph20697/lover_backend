@@ -2,6 +2,7 @@ package com.codegym.config;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
@@ -42,6 +43,7 @@ public class SecurityConfig {
                 .cors(cors -> cors.configurationSource(corsConfigurationSource()))
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(auth -> auth
+                        .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
                         .requestMatchers("/api/users/register", "/api/users/login").permitAll()
                         .requestMatchers("/api/users/exists/**").permitAll()
                         .requestMatchers("/api/users/check-email/**").permitAll()
@@ -55,6 +57,8 @@ public class SecurityConfig {
                         .requestMatchers("/api/ccdv/hire-sessions/test-email-html").permitAll()
                         // Hire sessions endpoints
                         .requestMatchers("/api/ccdv/hire-sessions/**").permitAll()
+                        .requestMatchers("/ws/**").permitAll()
+                        .requestMatchers("/api/messages/**").permitAll()
                         .requestMatchers("/api/ccdv-profiles/create").hasRole("SERVICE_PROVIDER")
                         .requestMatchers("/api/ccdv/**").hasRole("SERVICE_PROVIDER")
                         .requestMatchers("/api/hire/create").hasRole("USER")
