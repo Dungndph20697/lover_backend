@@ -45,7 +45,9 @@ public class SecurityConfig {
                         .requestMatchers("/api/users/register", "/api/users/login").permitAll()
                         .requestMatchers("/api/users/exists/**").permitAll()
                         .requestMatchers("/api/users/check-email/**").permitAll()
-                        .requestMatchers("/api/users/check-phone/**").permitAll()
+                        .requestMatchers("/api/users/check-email/**").permitAll()
+                        .requestMatchers("/api/users/profiles/**").permitAll()
+                        .requestMatchers("/api/users/service/**").permitAll()
                         .requestMatchers("/api/users/check-cccd/**").permitAll()
                         .requestMatchers("/api/users/register").permitAll()
                         .requestMatchers("/api/sepay/webhook").permitAll()
@@ -62,6 +64,8 @@ public class SecurityConfig {
                         .requestMatchers("/api/admin/withdraw/**").hasRole("ADMIN")
 
 
+                        .requestMatchers("/api/ccdv/**").hasRole("SERVICE_PROVIDER")
+                        .requestMatchers("/api/hire/create").hasRole("USER")
                         .anyRequest().authenticated()
                 )
                 .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class);
