@@ -5,6 +5,9 @@ import com.codegym.dto.RevenueResponseDTO;
 import com.codegym.service.tongdoanhthu.RevenueService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+
+import org.springframework.security.access.prepost.PreAuthorize;
+
 import org.springframework.web.bind.annotation.*;
 
 import java.security.Principal;
@@ -53,6 +56,7 @@ public class TongDoanhThuController {
                 dto.getStart(), dto.getEnd()
         ));
     }
+
 
     @PostMapping("/week-range")
     public ResponseEntity<?> revenueByWeek(
@@ -124,6 +128,7 @@ public class TongDoanhThuController {
                 "data", result
         ));
     }
+
 
     // --- 1. Verify password ---
     @PostMapping("/verify-password")

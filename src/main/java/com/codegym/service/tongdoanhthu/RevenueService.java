@@ -2,7 +2,9 @@ package com.codegym.service.tongdoanhthu;
 
 import com.codegym.dto.RevenuePerDayDTO;
 
+
 import java.time.LocalDate;
+
 import java.time.LocalDateTime;
 import java.time.YearMonth;
 import java.util.List;
@@ -26,7 +28,9 @@ public interface RevenueService {
     Double revenueToday(String username);
     Double revenueThisMonth(String username);
     Double revenueInRange(String username, LocalDateTime start, LocalDateTime end);
+
     Map<Integer, Double> revenueByWeek(String username, LocalDateTime from, LocalDateTime to);
     Map<Integer, Double> revenueByMonth(String username, LocalDateTime from, LocalDateTime to);
     Map<LocalDate, Double> revenueByDay(String username, LocalDateTime start, LocalDateTime end);
+
 }
