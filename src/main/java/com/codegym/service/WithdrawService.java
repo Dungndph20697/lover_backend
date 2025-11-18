@@ -6,6 +6,10 @@ import com.codegym.model.WithdrawRequest;
 import com.codegym.repository.WalletRepository;
 import com.codegym.repository.WithdrawRequestRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
@@ -208,17 +212,30 @@ public class WithdrawService {
         return withdrawRepo.findByUserOrderByCreatedAtDesc(user);
     }
 
-    // 7) ADMIN xem tất cả yêu cầu rút
     public List<WithdrawRequest> getAdminList() {
-        return withdrawRepo.findAllByOrderByCreatedAtDesc();
+        // nếu vẫn muốn list full:
+        return withdrawRepo.findAll(Sort.by(Sort.Direction.DESC, "createdAt"));
     }
 
-    // admin tim kiem theo keyword
-    public List<WithdrawRequest> searchAdmin(String keyword) {
-        if (keyword == null || keyword.isEmpty()){
-            return withdrawRepo.findAllByOrderByCreatedAtDesc();
+    // admin tìm kiếm theo keyword + phân trang cho DataTable
+    public Map<String, Object> searchAdmin(String keyword, int page, int size) {
+
+        Pageable pageable = PageRequest.of(page, size, Sort.by("createdAt").descending());
+
+        Page<WithdrawRequest> result;
+
+        if (keyword == null || keyword.isBlank()) {
+            result = withdrawRepo.findAllByOrderByCreatedAtDesc(pageable);
+        } else {
+            result = withdrawRepo.searchAdmin(keyword.trim(), pageable);
         }
-        return withdrawRepo.searchAdmin(keyword.trim());
+
+        return Map.of(
+                "data", result.getContent(),
+                "total", result.getTotalElements(),
+                "page", result.getNumber(),
+                "size", result.getSize()
+        );
     }
 
 }

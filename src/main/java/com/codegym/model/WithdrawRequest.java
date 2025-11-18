@@ -1,6 +1,9 @@
 package com.codegym.model;
 
 import jakarta.persistence.*;
+import jakarta.validation.constraints.Min;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -25,12 +28,17 @@ public class WithdrawRequest {
     @JoinColumn(name = "user_id")
     private User user;
 
+    @NotNull
+    @Min(1)
     private Double amount;
     private Double fee;
     private Double amountReceived;
 
-    private String bankName;             // Tên ngân hàng
-    private String bankAccountNumber;    // Số tài khoản
+    @NotBlank
+    private String bankName;
+    @NotBlank// Tên ngân hàng
+    private String bankAccountNumber;
+    @NotBlank// Số tài khoản
     private String bankAccountName;      // Tên chủ tài khoản
 
     private String otp;

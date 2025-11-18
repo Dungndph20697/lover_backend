@@ -30,8 +30,12 @@ public class AdminWithdrawController {
     }
 
     @GetMapping("/search")
-    public ResponseEntity<?> search(@RequestParam(required = false) String keyword) {
-        return ResponseEntity.ok(withdrawService.searchAdmin(keyword));
+    public ResponseEntity<?> search(
+            @RequestParam(required = false) String keyword,
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size
+    ) {
+        return ResponseEntity.ok(withdrawService.searchAdmin(keyword, page, size));
     }
 }
 
