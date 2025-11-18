@@ -26,4 +26,8 @@ public interface CcdvServiceDetailRepository extends JpaRepository<CcdvServiceDe
             "WHERE c.user.id = :userId AND c.serviceType.id = :serviceId " +
             "AND UPPER(c.serviceType.type) <> 'FREE'")
     void updatePriceByUserAndService(Long userId, Long serviceId, BigDecimal price);
+    @Query(value = "SELECT * FROM ccdv_service_detail WHERE provider_id = :providerId ORDER BY RAND() LIMIT :limit",
+            nativeQuery = true)
+    List<CcdvServiceDetail> findRandomServices(Long providerId, int limit);
+
 }

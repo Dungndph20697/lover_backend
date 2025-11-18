@@ -82,4 +82,7 @@ public class CcdvProfile {
     @Column(name = "hire_count")
     private Integer hireCount;
 
+    @Column(name = "view_count")
+    private Long viewCount;
+
 }

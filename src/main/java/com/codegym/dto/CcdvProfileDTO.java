@@ -1,6 +1,5 @@
 package com.codegym.dto;
 
-import com.codegym.model.User;
 import lombok.*;
 import org.springframework.web.multipart.MultipartFile;
 

@@ -3,20 +3,21 @@ package com.codegym.service;
 import com.cloudinary.Cloudinary;
 import com.cloudinary.utils.ObjectUtils;
 import com.codegym.dto.CcdvProfileDTO;
+import com.codegym.dto.LatestProviderDTO;
 import com.codegym.model.CcdvProfile;
 import com.codegym.model.User;
 import com.codegym.repository.CcdvProfileRepository;
 import com.codegym.repository.UserRepository;
 import com.codegym.service.interfaceService.CcdvProfileService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.io.File;
 import java.io.IOException;
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.Map;
-import java.util.UUID;
 
 @Service
 public class CcdvProfileServiceImpl implements CcdvProfileService {
@@ -29,6 +30,8 @@ public class CcdvProfileServiceImpl implements CcdvProfileService {
 
     @Autowired
     private Cloudinary cloudinary;
+
+
 
 //    private final String uploadDir = "C:\\Users\\duytr\\Downloads\\upload";
 
@@ -102,10 +105,28 @@ public class CcdvProfileServiceImpl implements CcdvProfileService {
     private String uploadFile(MultipartFile file) throws IOException {
         if (file == null || file.isEmpty()) return null;
 
-        Map uploadResult = cloudinary.uploader().upload(file.getBytes(),
+        Map<String, Object> uploadResult = cloudinary.uploader().upload(file.getBytes(),
                 ObjectUtils.asMap("resource_type", "auto"));
 
         return (String) uploadResult.get("secure_url");
     }
-}
 
+
+    @Override
+    public List<LatestProviderDTO> getLatestProviders(int limit) {
+
+        List<CcdvProfile> profiles =
+                ccdvProfileRepository.findAllByOrderByJoinDateDesc(PageRequest.of(0, limit));
+
+        return profiles.stream()
+                .map(p -> new LatestProviderDTO(
+                        p.getId(),
+                        p.getFullName(),
+                        p.getCity(),
+                        p.getAvatar(),
+                        p.getYearOfBirth(),
+                        p.getGender()
+                ))
+                .toList();
+    }
+}
