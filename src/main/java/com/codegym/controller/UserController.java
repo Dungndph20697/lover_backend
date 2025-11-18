@@ -1,12 +1,18 @@
 package com.codegym.controller;
 
+
 import com.codegym.dto.TopCcdvDTO;
+
+import com.codegym.model.CcdvServiceDetail;
+
 import com.codegym.model.User;
 import com.codegym.service.JwtService;
 import com.codegym.service.UserService;
+import com.codegym.service.impl.CcdvServiceDetailService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -23,6 +29,9 @@ import java.util.Map;
 @RequestMapping("/api/users")
 @RequiredArgsConstructor
 public class UserController {
+
+    @Autowired
+    private CcdvServiceDetailService serviceDetailService;
 
     @Autowired
     private UserService userService;
@@ -90,7 +99,6 @@ public class UserController {
         return ResponseEntity.ok(exists);
     }
 
-    //
 
     @GetMapping("/me")
     public ResponseEntity<?> getCurrentUser(Authentication authentication) {
@@ -99,7 +107,16 @@ public class UserController {
         }
 
         String username = authentication.getName();
-        User user = userService.findUserByUsername(username).get();
+
+        User user = userService.findUserByUsername(username)
+                .orElseThrow(() -> new RuntimeException("User không tồn tại"));
+
+        //  Nếu user chưa có mã nạp tiền → tạo ngay
+        if (user.getTopupCode() == null || user.getTopupCode().trim().isEmpty()) {
+            String topupCode = "C0525G1" + user.getId();  // Mã gọn nhẹ
+            user.setTopupCode(topupCode);
+            userService.save(user); // Lưu lại DB
+        }
 
         return ResponseEntity.ok(user);
     }
@@ -122,4 +139,18 @@ public class UserController {
         List<TopCcdvDTO> top6 = userService.getTop6CcdvByView();
         return ResponseEntity.ok(top6);
     }
+
+    @GetMapping("/service/{userId}")
+    public ResponseEntity<?> getUserServices(@PathVariable Long userId) {
+        try {
+            List<CcdvServiceDetail> details = serviceDetailService.getServicesByUser(userId);
+            return ResponseEntity.ok(details);
+        } catch (Exception e) {
+            return ResponseEntity
+                    .status(HttpStatus.BAD_REQUEST)
+                    .body("❌ Lỗi khi lấy danh sách dịch vụ: " + e.getMessage());
+        }
+    }
+
+
 }

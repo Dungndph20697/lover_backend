@@ -2,6 +2,7 @@ package com.codegym.service;
 
 import com.codegym.model.CcdvProfile;
 import com.codegym.model.HireSession;
+import com.codegym.model.Report;
 import com.codegym.repository.CcdvProfileRepository;
 import com.codegym.repository.QuanLiDonThueRepository;
 import lombok.RequiredArgsConstructor;
@@ -18,6 +19,7 @@ public class QuanLiDonThueService {
     private final QuanLiDonThueRepository quanLiDonThueRepository;
     private final CcdvProfileRepository ccdvProfileRepository;
     private final EmailNotificationService emailNotificationService;
+    private final ReportService reportService;
 
     // LẤY DANH SÁCH ĐƠN THUÊ
     public Map<String, Object> getCcdvSessions(Long ccdvId) {
@@ -143,12 +145,12 @@ public class QuanLiDonThueService {
         return response;
     }
 
-    // BÁO CÁO VỀ KHÁCH HÀNG (COMPLETED -> REPORTED) + gửi tin nhắn
+    // BÁO CÁO VỀ KHÁCH HÀNG (COMPLETED -> REPORTED)
     @Transactional
-    public Map<String, Object> reportClient(Long sessionId, Long ccdvId, String report) {
+    public Map<String, Object> reportClient(Long sessionId, Long ccdvId, String reportContent) {
         Map<String, Object> response = new HashMap<>();
 
-        if (report == null || report.trim().isEmpty()) {
+        if (reportContent == null || reportContent.trim().isEmpty()) {
             response.put("success", false);
             response.put("message", "Nội dung báo cáo không được để trống");
             return response;
@@ -175,18 +177,65 @@ public class QuanLiDonThueService {
             return response;
         }
 
-        session.setUserReport(report);
+        // Lưu qua bảng hire_sessions
+        session.setUserReport(reportContent);
         session.setStatus("REPORTED");
         session.setUpdatedAt(LocalDateTime.now());
         quanLiDonThueRepository.save(session);
 
-        String userEmail = session.getUser().getEmail();
-        response.put("userEmail", userEmail);
-        response.put("success", true);
-        response.put("message", "Đơn thuê đã được xác nhận thành công");
+        // Lưu bản báo cáo vào bảng reports
+        Report savedReport = reportService.saveReport(session, reportContent);
 
+        response.put("success", true);
+        response.put("message", "Báo cáo đã được gửi cho admin");
+        response.put("data", savedReport);
         return response;
     }
+
+
+//    @Transactional
+//    public Map<String, Object> reportClient(Long sessionId, Long ccdvId, String report) {
+//        Map<String, Object> response = new HashMap<>();
+//
+//        if (report == null || report.trim().isEmpty()) {
+//            response.put("success", false);
+//            response.put("message", "Nội dung báo cáo không được để trống");
+//            return response;
+//        }
+//
+//        Optional<HireSession> sessionOpt = quanLiDonThueRepository.findById(sessionId);
+//        if (sessionOpt.isEmpty()) {
+//            response.put("success", false);
+//            response.put("message", "Đơn thuê không tồn tại");
+//            return response;
+//        }
+//
+//        HireSession session = sessionOpt.get();
+//
+//        if (!session.getCcdv().getId().equals(ccdvId)) {
+//            response.put("success", false);
+//            response.put("message", "Bạn không có quyền xử lý đơn này");
+//            return response;
+//        }
+//
+//        if (!"COMPLETED".equals(session.getStatus())) {
+//            response.put("success", false);
+//            response.put("message", "Chỉ có thể báo cáo đơn ở trạng thái 'Đã hoàn thành'");
+//            return response;
+//        }
+//
+//        session.setUserReport(report);
+//        session.setStatus("REPORTED");
+//        session.setUpdatedAt(LocalDateTime.now());
+//        quanLiDonThueRepository.save(session);
+//
+//        String userEmail = session.getUser().getEmail();
+//        response.put("userEmail", userEmail);
+//        response.put("success", true);
+//        response.put("message", "Đơn thuê đã được xác nhận thành công");
+//
+//        return response;
+//    }
 
     // LẤY CHI TIẾT ĐƠN THUÊ
     public Map<String, Object> getSessionDetail(Long sessionId) {

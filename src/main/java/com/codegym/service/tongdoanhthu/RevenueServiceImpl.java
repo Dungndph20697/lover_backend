@@ -1,9 +1,14 @@
 package com.codegym.service.tongdoanhthu;
 
+
 import com.codegym.model.CcdvProfile;
 import com.codegym.model.HireSession;
 import com.codegym.model.User;
 import com.codegym.repository.CcdvProfileRepository;
+
+import com.codegym.model.HireSession;
+import com.codegym.model.User;
+
 import com.codegym.repository.TongDoanhThuRepository;
 import com.codegym.service.UserService;
 
@@ -14,7 +19,9 @@ import org.springframework.stereotype.Service;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.YearMonth;
+
 import java.time.temporal.WeekFields;
+
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -31,8 +38,10 @@ public class RevenueServiceImpl implements RevenueService {
 
     @Autowired
     private PasswordEncoder passwordEncoder;
+
     @Autowired
     private CcdvProfileRepository ccdvProfileRepository;
+
 
     @Autowired
     public RevenueServiceImpl(UserService userService,
@@ -81,6 +90,7 @@ public class RevenueServiceImpl implements RevenueService {
 
         return repository.sumRevenueByCcdvAndDateRange(user.getId(), start, end);
     }
+
 
     @Override
     public Map<Integer, Double> revenueByWeek(String username, LocalDateTime from, LocalDateTime to) {
@@ -131,4 +141,5 @@ public class RevenueServiceImpl implements RevenueService {
         }
         return dayRevenue;
     }
+
 }

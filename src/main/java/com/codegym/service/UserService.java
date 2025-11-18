@@ -4,9 +4,15 @@ import com.codegym.dto.TopCcdvDTO;
 import com.codegym.model.Role;
 import com.codegym.repository.UserRepository;
 import com.codegym.model.User;
+
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.PageRequest;
+
+import com.codegym.repository.WalletRepository;
+import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Autowired;
+
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -19,6 +25,8 @@ import java.util.Optional;
 @Transactional
 @RequiredArgsConstructor
 public class UserService {
+    @Autowired
+    private WalletRepository walletRepository;
 
     private final UserRepository userRepository;
     private final BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
@@ -51,6 +59,13 @@ public class UserService {
         User savedUser = userRepository.save(user);
         savedUser.setPassword(null);
 
+        // Sinh mã nạp tiền dạng U{ID}
+        String topupCode = "C0525G1" + savedUser.getId();
+        savedUser.setTopupCode(topupCode);
+
+        //Lưu lại mã vào DB
+        userRepository.save(savedUser);
+
         response.put("success", true);
         response.put("message", "Đăng ký thành công");
         response.put("data", savedUser);
@@ -81,6 +96,7 @@ public class UserService {
         return userRepository.findByUsername(username);
     }
 
+
     public void increaseView(Long id) {
         userRepository.increaseView(id);
     }
@@ -94,4 +110,11 @@ public class UserService {
         Long ccdvRoleId = 2L; // role của CCDV
         return userRepository.findTopCcdvWithProfile(ccdvRoleId, PageRequest.of(0, 6));
     }
+
+    public User save(User user) {
+        return userRepository.save(user);
+    }
+
+
+
 }
