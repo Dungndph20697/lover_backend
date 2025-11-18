@@ -5,7 +5,9 @@ import com.codegym.dto.RevenueResponseDTO;
 import com.codegym.service.tongdoanhthu.RevenueService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+
 import org.springframework.security.access.prepost.PreAuthorize;
+
 import org.springframework.web.bind.annotation.*;
 
 import java.security.Principal;
@@ -52,6 +54,78 @@ public class TongDoanhThuController {
         return ResponseEntity.ok(new RevenueResponseDTO(
                 revenue, "VND",
                 dto.getStart(), dto.getEnd()
+        ));
+    }
+
+
+    @PostMapping("/week-range")
+    public ResponseEntity<?> revenueByWeek(
+            @RequestBody RevenueRangeRequestDTO dto,
+            Principal principal) {
+
+        LocalDateTime start = LocalDate.parse(dto.getStart()).atStartOfDay();
+        LocalDateTime end = LocalDate.parse(dto.getEnd()).atTime(23, 59, 59);
+
+        Map<Integer, Double> data = revenueService.revenueByWeek(
+                principal.getName(), start, end
+        );
+
+        var result = data.entrySet()
+                .stream()
+                .map(e -> Map.of(
+                        "week", e.getKey(),
+                        "revenue", e.getValue()
+                ))
+                .collect(Collectors.toList());
+
+        return ResponseEntity.ok(Map.of(
+                "type", "WEEK",
+                "data", result
+        ));
+    }
+
+    @PostMapping("/month-range")
+    public ResponseEntity<?> revenueByMonth(
+            @RequestBody RevenueRangeRequestDTO dto,
+            Principal principal) {
+
+        LocalDateTime start = LocalDate.parse(dto.getStart()).atStartOfDay();
+        LocalDateTime end = LocalDate.parse(dto.getEnd()).atTime(23, 59, 59);
+
+        Map<Integer, Double> data = revenueService.revenueByMonth(
+                principal.getName(), start, end
+        );
+
+        var result = data.entrySet()
+                .stream()
+                .map(e -> Map.of(
+                        "month", e.getKey(),
+                        "revenue", e.getValue()
+                ))
+                .collect(Collectors.toList());
+
+        return ResponseEntity.ok(Map.of(
+                "type", "MONTH",
+                "data", result
+        ));
+    }
+
+    @PostMapping("/day-range")
+    public ResponseEntity<?> revenueByDay(@RequestBody RevenueRangeRequestDTO dto, Principal principal) {
+        LocalDateTime start = LocalDate.parse(dto.getStart()).atStartOfDay();
+        LocalDateTime end = LocalDate.parse(dto.getEnd()).atTime(23, 59, 59);
+
+        Map<LocalDate, Double> data = revenueService.revenueByDay(principal.getName(), start, end);
+        var result = data.entrySet().stream()
+                .map(e -> Map.of(
+                        "date", e.getKey().toString(),
+                        "revenue", e.getValue()
+                ))
+                .collect(Collectors.toList());
+
+        return ResponseEntity.ok(Map.of(
+                "type", "DAY",
+                "data", result
         ));
     }
 

@@ -5,11 +5,14 @@ import com.codegym.dto.TopRecentCustomerDTO;
 import com.codegym.model.HireSession;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
+
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
+
 import java.util.List;
 
+@Repository
 public interface QuanLiDonThueRepository extends JpaRepository<HireSession, Long> {
     
     // Lấy danh sách đơn thuê theo CCDV
