@@ -127,9 +127,9 @@ public class UserHireService {
         Map<String, Object> stats = new HashMap<>();
 
         // Đếm số đơn theo trạng thái
-        Long waitingCount = userHireRepository.countByUserIdAndStatus(userId, "Chờ phản hồi");
-        Long acceptedCount = userHireRepository.countByUserIdAndStatus(userId, "Đã nhận");
-        Long completedCount = userHireRepository.countByUserIdAndStatus(userId, "Đã hoàn thành");
+        Long waitingCount = userHireRepository.countByUserIdAndStatus(userId, "PENDING");
+        Long acceptedCount = userHireRepository.countByUserIdAndStatus(userId, "ACCEPTED");
+        Long completedCount = userHireRepository.countByUserIdAndStatus(userId, "COMPLETED");
 
         // Tổng số đơn
         Long totalCount = (waitingCount != null ? waitingCount : 0L) +
@@ -138,7 +138,7 @@ public class UserHireService {
 
         // Tổng tiền đã chi
         Double totalAmount = userHireRepository.sumTotalPriceByUserId(userId);
-        Double completedAmount = userHireRepository.sumTotalPriceByUserIdAndStatus(userId, "Đã hoàn thành");
+        Double completedAmount = userHireRepository.sumTotalPriceByUserIdAndStatus(userId, "COMPLETED");
 
         stats.put("total", totalCount);
         stats.put("waiting", waitingCount != null ? waitingCount : 0L);
