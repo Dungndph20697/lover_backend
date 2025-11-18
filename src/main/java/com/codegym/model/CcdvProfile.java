@@ -1,5 +1,6 @@
 package com.codegym.model;
 
+import com.codegym.model.enums.ProfileStatus;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -80,5 +81,9 @@ public class CcdvProfile {
 
     @Column(name = "hire_count")
     private Integer hireCount;
+
+    @Enumerated(EnumType.STRING)
+    @Column(length = 20, nullable = false)
+    private ProfileStatus status = ProfileStatus.ACTIVE; // mặc định là ACTIVE
 
 }
