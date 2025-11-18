@@ -1,19 +1,28 @@
 package com.codegym.service;
 
+import com.codegym.dto.TopCcdvDTO;
 import com.codegym.model.Role;
 import com.codegym.repository.UserRepository;
 import com.codegym.model.User;
+
+import jakarta.transaction.Transactional;
+import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.PageRequest;
+
 import com.codegym.repository.WalletRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
+
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
 @Service
+@Transactional
 @RequiredArgsConstructor
 public class UserService {
     @Autowired
@@ -86,10 +95,25 @@ public class UserService {
     public Optional<User> findUserByUsername(String username) {
         return userRepository.findByUsername(username);
     }
+
+
+    public void increaseView(Long id) {
+        userRepository.increaseView(id);
+    }
+
+    public User findById(Long id) {
+        return userRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("User not found"));
+    }
+
+    public List<TopCcdvDTO> getTop6CcdvByView() {
+        Long ccdvRoleId = 2L; // role của CCDV
+        return userRepository.findTopCcdvWithProfile(ccdvRoleId, PageRequest.of(0, 6));
+    }
+
     public User save(User user) {
         return userRepository.save(user);
     }
-
 
 
 

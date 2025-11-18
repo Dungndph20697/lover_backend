@@ -61,4 +61,8 @@ public class User {
     @JoinColumn(name = "role_id", nullable = false)
     private Role role;
 
+
+    @Column(name = "view_count")
+    private Integer viewCount = 0;
+
 }

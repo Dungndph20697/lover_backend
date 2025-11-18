@@ -66,6 +66,10 @@ public class SecurityConfig {
 
                         .requestMatchers("/api/ccdv-profiles/create").hasRole("SERVICE_PROVIDER")
 
+                        .requestMatchers("/api/revenue/**").permitAll()
+                        .requestMatchers("/api/users/top-ccdv-view").permitAll()
+
+
                         .requestMatchers("/api/ccdv-profiles/user/**").hasRole("SERVICE_PROVIDER")
                         .requestMatchers("/api/ccdv-profiles/update/**").hasRole("SERVICE_PROVIDER")
                         .requestMatchers("/api/ccdv-profiles/toggle-status/**").hasRole("SERVICE_PROVIDER")
@@ -79,6 +83,7 @@ public class SecurityConfig {
 
                         .requestMatchers("/api/ccdv/**").hasRole("SERVICE_PROVIDER")
                         .requestMatchers("/api/hire/create").hasRole("USER")
+
 
                         .anyRequest().authenticated()
                 )

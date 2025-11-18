@@ -43,11 +43,13 @@ public class HireSession {
     private LocalDateTime createdAt;
 
     // Thêm trường mới
+    @Column(name = "address")
     private String address; // Địa chỉ nơi cung cấp dịch vụ
+
+    @Column(name = "user_report")
     private String userReport; // Báo cáo từ người thuê về buổi thuê
 
     @UpdateTimestamp
     @Column(name = "updated_at")
     private LocalDateTime updatedAt; // Thời gian cập nhật cuối cùng
-
 }
