@@ -64,4 +64,5 @@ public class User {
 
     @Column(name = "view_count")
     private Integer viewCount = 0;
+
 }

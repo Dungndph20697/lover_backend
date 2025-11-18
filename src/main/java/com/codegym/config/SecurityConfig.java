@@ -66,6 +66,7 @@ public class SecurityConfig {
 
                         .requestMatchers("/api/ccdv-profiles/create").hasRole("SERVICE_PROVIDER")
 
+
                         .requestMatchers("/api/ccdv-profiles/user/**").hasRole("SERVICE_PROVIDER")
                         .requestMatchers("/api/ccdv-profiles/update/**").hasRole("SERVICE_PROVIDER")
                         .requestMatchers("/api/ccdv-profiles/toggle-status/**").hasRole("SERVICE_PROVIDER")
@@ -82,6 +83,23 @@ public class SecurityConfig {
 
                         .requestMatchers("/api/revenue/**").permitAll()
                         .requestMatchers("/api/users/top-ccdv-view").permitAll()
+                        .requestMatchers("/api/home/top-ccdv").permitAll()
+
+                        .requestMatchers("/api/ccdv-profiles/user/**").hasRole("SERVICE_PROVIDER")
+                        .requestMatchers("/api/ccdv-profiles/update/**").hasRole("SERVICE_PROVIDER")
+                        .requestMatchers("/api/ccdv-profiles/toggle-status/**").hasRole("SERVICE_PROVIDER")
+                        .requestMatchers("/api/wallet/topup").hasAnyRole("USER", "SERVICE_PROVIDER")
+                        .requestMatchers("/api/wallet/balance").hasAnyRole("USER", "SERVICE_PROVIDER")
+                        // endpoint rút tiền chỉ dành cho SERVICE_PROVIDER
+                        .requestMatchers("/api/withdraw/**").hasRole("SERVICE_PROVIDER")
+                        // endpoint duyệt rút tiền chỉ dành cho ADMIN
+                        .requestMatchers("/api/admin/withdraw/**").hasRole("ADMIN")
+
+
+                        .requestMatchers("/api/ccdv/**").hasRole("SERVICE_PROVIDER")
+                        .requestMatchers("/api/hire/create").hasRole("USER")
+
+
                         .anyRequest().authenticated()
                 )
                 .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class);
