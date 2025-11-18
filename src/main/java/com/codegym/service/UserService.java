@@ -5,7 +5,9 @@ import com.codegym.model.Role;
 import com.codegym.repository.UserRepository;
 import com.codegym.model.User;
 import jakarta.transaction.Transactional;
+import com.codegym.repository.WalletRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -19,6 +21,8 @@ import java.util.Optional;
 @Transactional
 @RequiredArgsConstructor
 public class UserService {
+    @Autowired
+    private WalletRepository walletRepository;
 
     private final UserRepository userRepository;
     private final BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
@@ -51,6 +55,13 @@ public class UserService {
         User savedUser = userRepository.save(user);
         savedUser.setPassword(null);
 
+        // Sinh mã nạp tiền dạng U{ID}
+        String topupCode = "C0525G1" + savedUser.getId();
+        savedUser.setTopupCode(topupCode);
+
+        //Lưu lại mã vào DB
+        userRepository.save(savedUser);
+
         response.put("success", true);
         response.put("message", "Đăng ký thành công");
         response.put("data", savedUser);
@@ -80,6 +91,13 @@ public class UserService {
     public Optional<User> findUserByUsername(String username) {
         return userRepository.findByUsername(username);
     }
+    public User save(User user) {
+        return userRepository.save(user);
+    }
+
+
+
+
 
     public void increaseView(Long id) {
         userRepository.increaseView(id);

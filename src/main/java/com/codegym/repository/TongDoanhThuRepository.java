@@ -26,6 +26,7 @@ public interface TongDoanhThuRepository extends JpaRepository<HireSession, Long>
                                                 @Param("start") LocalDateTime start,
                                                 @Param("end") LocalDateTime end);
 
+
     @Query("SELECT h FROM HireSession h " +
             "WHERE h.startTime >= :from AND h.endTime <= :to " +
             "AND h.status = 'DONE'")
