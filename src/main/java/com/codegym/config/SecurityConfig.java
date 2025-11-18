@@ -43,15 +43,14 @@ public class SecurityConfig {
                 .cors(cors -> cors.configurationSource(corsConfigurationSource()))
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
+
                         .requestMatchers("/api/users/register", "/api/users/login").permitAll()
                         .requestMatchers("/api/users/exists/**").permitAll()
                         .requestMatchers("/api/users/check-email/**").permitAll()
-                        .requestMatchers("/api/users/check-email/**").permitAll()
+                        .requestMatchers("/api/users/check-phone/**").permitAll()
                         .requestMatchers("/api/users/profiles/**").permitAll()
                         .requestMatchers("/api/users/service/**").permitAll()
                         .requestMatchers("/api/users/check-cccd/**").permitAll()
-                        .requestMatchers("/api/users/register").permitAll()
 
                         // Test email endpoints
                         .requestMatchers("/api/ccdv/hire-sessions/test-email").permitAll()
