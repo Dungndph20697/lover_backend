@@ -56,7 +56,11 @@ public class SecurityConfig {
                         .requestMatchers("/api/ccdv-profiles/toggle-status/**").hasRole("SERVICE_PROVIDER")
                         .requestMatchers("/api/wallet/topup").hasAnyRole("USER", "SERVICE_PROVIDER")
                         .requestMatchers("/api/wallet/balance").hasAnyRole("USER", "SERVICE_PROVIDER")
-                        .requestMatchers("/api/sepay/webhook").permitAll()
+                        // endpoint rút tiền chỉ dành cho SERVICE_PROVIDER
+                        .requestMatchers("/api/withdraw/**").hasRole("SERVICE_PROVIDER")
+                        // endpoint duyệt rút tiền chỉ dành cho ADMIN
+                        .requestMatchers("/api/admin/withdraw/**").hasRole("ADMIN")
+
 
                         .anyRequest().authenticated()
                 )
