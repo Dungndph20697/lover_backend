@@ -2,12 +2,15 @@ package com.codegym.controller;
 
 import com.codegym.dto.CcdvProfileDTO;
 import com.codegym.model.CcdvProfile;
+import com.codegym.model.enums.ProfileStatus;
 import com.codegym.service.CcdvProfileServiceImpl;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.Map;
 
 @RestController
 @RequestMapping("/api/ccdv-profiles")
@@ -68,6 +71,28 @@ public class DangThongTinCaNhanController {
         } catch (Exception e) {
             e.printStackTrace();
             return ResponseEntity.internalServerError().body("Lỗi khi cập nhật hồ sơ");
+        }
+    }
+
+
+    // API chuyển đổi trạng thái
+    @PutMapping("/toggle-status/{userId}")
+    @PreAuthorize("isAuthenticated()")
+    public ResponseEntity<?> toggleStatus(@PathVariable("userId") Long userId) {
+        try {
+            CcdvProfile updatedProfile = ccdvProfileService.toggleStatus(userId);
+            String message = updatedProfile.getStatus() == ProfileStatus.ACTIVE
+                    ? "✅ Hồ sơ đã được kích hoạt lại — bạn đang sẵn sàng cung cấp dịch vụ!"
+                    : "🕓 Bạn đã tạm ngưng cung cấp dịch vụ.";
+
+            return ResponseEntity.ok(Map.of(
+                    "message", message,
+                    "newStatus", updatedProfile.getStatus().name(),
+                    "profile", updatedProfile
+            ));
+        } catch (Exception e) {
+            e.printStackTrace();
+            return ResponseEntity.internalServerError().body("❌ Lỗi khi thay đổi trạng thái CCDV");
         }
     }
 }

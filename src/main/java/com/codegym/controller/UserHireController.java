@@ -16,6 +16,13 @@ public class UserHireController {
 
     private final UserHireService userHireService;
 
+    //    Lấy thống kê
+    @GetMapping("/statistics/{userId}")
+    public ResponseEntity<Map<String, Object>> getUserStatistics(@PathVariable Long userId) {
+        Map<String, Object> stats = userHireService.getUserStatistics(userId);
+        return ResponseEntity.ok(stats);
+    }
+
     //    Lấy danh sách đơn đã thuê
     @GetMapping
     public ResponseEntity<Page<HireSession>> getUserHireSessions(
@@ -80,13 +87,6 @@ public class UserHireController {
 
         HireSession session = userHireService.addUserReport(sessionId, userId, report);
         return ResponseEntity.ok(session);
-    }
-
-    //    Lấy thống kê
-    @GetMapping("/statistics/{userId}")
-    public ResponseEntity<Map<String, Object>> getUserStatistics(@PathVariable Long userId) {
-        Map<String, Object> stats = userHireService.getUserStatistics(userId);
-        return ResponseEntity.ok(stats);
     }
 
     //    Exception Handler

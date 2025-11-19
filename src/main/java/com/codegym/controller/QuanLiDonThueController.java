@@ -1,5 +1,6 @@
 package com.codegym.controller;
 
+import com.codegym.model.HireSession;
 import com.codegym.service.EmailNotificationService;
 import com.codegym.service.QuanLiDonThueService;
 import lombok.RequiredArgsConstructor;
@@ -12,7 +13,6 @@ import java.util.Map;
 @RequestMapping("/api/ccdv/hire-sessions")
 @RequiredArgsConstructor
 public class QuanLiDonThueController {
-
     private final QuanLiDonThueService quanLiDonThueService;
     private final EmailNotificationService emailNotificationService;
 
@@ -70,7 +70,7 @@ public class QuanLiDonThueController {
     }
 
     @GetMapping("/{ccdvId}")
-    public ResponseEntity<Map<String, Object>> getSessions(@PathVariable Long ccdvId) {
+    public ResponseEntity<Map<String, Object>> getSessions(@PathVariable("ccdvId") Long ccdvId) {
         return ResponseEntity.ok(quanLiDonThueService.getCcdvSessions(ccdvId));
     }
 

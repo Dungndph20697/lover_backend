@@ -18,6 +18,9 @@ public class User {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    private String topupCode;
+
+
     @Column(unique = true, nullable = false, length = 50)
     @NotBlank(message = "username không được để trống")
     @Size(min = 3, max = 50, message = "username phải từ 3 đến 50 ký tự")
@@ -57,4 +60,9 @@ public class User {
     @ManyToOne
     @JoinColumn(name = "role_id", nullable = false)
     private Role role;
+
+
+    @Column(name = "view_count")
+    private Integer viewCount = 0;
+
 }
