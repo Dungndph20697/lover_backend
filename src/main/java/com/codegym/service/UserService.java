@@ -57,9 +57,8 @@ public class UserService {
 
         // Mã hóa mật khẩu
         user.setPassword(passwordEncoder.encode(user.getPassword()));
-
         User savedUser = userRepository.save(user);
-        savedUser.setPassword(null);
+//        savedUser.setPassword(null);
 
         // Sinh mã nạp tiền dạng U{ID}
         String topupCode = "C0525G1" + savedUser.getId();
@@ -76,6 +75,7 @@ public class UserService {
 
     // Kiểm tra username tồn tại
     public boolean checkUsernameExists(String username) {
+        System.out.println(username);
         return userRepository.existsByUsername(username);
     }
 

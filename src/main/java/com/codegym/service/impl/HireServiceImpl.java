@@ -1,15 +1,10 @@
 package com.codegym.service.impl;
 
 import com.codegym.dto.request.HireRequestDTO;
-import com.codegym.model.CcdvServiceDetail;
-import com.codegym.model.HireSession;
-import com.codegym.model.HireSessionCcdvservicedetail;
-import com.codegym.model.User;
-import com.codegym.repository.CcdvServiceDetailRepository;
-import com.codegym.repository.HireSessionCcdvservicedetailRepository;
-import com.codegym.repository.QuanLiDonThueRepository;
-import com.codegym.repository.UserRepository;
+import com.codegym.model.*;
+import com.codegym.repository.*;
 import com.codegym.service.IHireService;
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -23,6 +18,7 @@ import java.util.List;
 
 @Service
 @RequiredArgsConstructor
+@Transactional
 public class HireServiceImpl implements IHireService {
 
     @Autowired
@@ -37,31 +33,35 @@ public class HireServiceImpl implements IHireService {
     @Autowired
     private CcdvServiceDetailRepository ccdvServiceDetailRepository;
 
+    @Autowired
+    private WalletRepository walletRepository;
+
     @Override
+
     public HireSession createHire(HireRequestDTO request) {
 
-        // 1. Lấy người đang đăng nhập (người thuê)
+        // 1. Lấy người thuê
         String username = SecurityContextHolder.getContext().getAuthentication().getName();
         User user = userRepository.findByUsername(username)
-                .orElseThrow(() -> new RuntimeException("Không tìm thấy người dùng đang đăng nhập"));
+                .orElseThrow(() -> new RuntimeException("Không tìm thấy người dùng"));
 
-        // 2. Lấy người CCDV được thuê
+        // 2. Lấy CCDV
         User provider = userRepository.findById(request.getCcdvId())
                 .orElseThrow(() -> new RuntimeException("Không tìm thấy CCDV"));
 
+        // 3. Tính số giờ thuê
         LocalDateTime startTime = request.getStartTime();
-        LocalDateTime endTime   = request.getEndTime();
+        LocalDateTime endTime = request.getEndTime();
 
         if (startTime == null || endTime == null || !endTime.isAfter(startTime)) {
             throw new RuntimeException("Thời gian thuê không hợp lệ");
         }
 
-        // Tính số giờ thuê (có thể lẻ)
         long minutes = Duration.between(startTime, endTime).toMinutes();
         BigDecimal hours = BigDecimal.valueOf(minutes)
                 .divide(BigDecimal.valueOf(60), 2, RoundingMode.HALF_UP);
 
-        // 3. Lấy danh sách dịch vụ CCDV được chọn
+        // 4. Lấy danh sách dịch vụ
         List<CcdvServiceDetail> details =
                 ccdvServiceDetailRepository.findByIdIn(request.getServiceDetailIds());
 
@@ -69,7 +69,6 @@ public class HireServiceImpl implements IHireService {
             throw new RuntimeException("Bạn chưa chọn dịch vụ nào.");
         }
 
-        // Kiểm tra tất cả dịch vụ có đúng thuộc CCDV không
         boolean invalidOwner = details.stream()
                 .anyMatch(d -> !d.getUser().getId().equals(provider.getId()));
 
@@ -77,38 +76,64 @@ public class HireServiceImpl implements IHireService {
             throw new RuntimeException("Có dịch vụ không thuộc về CCDV này!");
         }
 
-        // 4. Tính tổng tiền = SUM(detail.totalPrice * hours)
+        // 5. Tính tiền
         BigDecimal totalMoney = BigDecimal.ZERO;
 
         for (CcdvServiceDetail detail : details) {
-            BigDecimal servicePrice = detail.getTotalPrice();
-
-            if (servicePrice != null && servicePrice.compareTo(BigDecimal.ZERO) > 0) {
-                totalMoney = totalMoney.add(servicePrice.multiply(hours));
+            BigDecimal price = detail.getTotalPrice();
+            if (price != null && price.compareTo(BigDecimal.ZERO) > 0) {
+                totalMoney = totalMoney.add(price.multiply(hours));
             }
         }
 
-        // 5. Tạo HireSession chính
+        double totalPrice = totalMoney.doubleValue();
+
+        // -----------------------
+        // 💰 XỬ LÝ TIỀN
+        // -----------------------
+
+        // Lấy ví người thuê
+        Wallet userWallet = walletRepository.findByUser(user)
+                .orElseThrow(() -> new RuntimeException("Ví người thuê không tồn tại"));
+
+        // Kiểm tra số dư
+        if (userWallet.getBalance() < totalPrice) {
+            throw new RuntimeException("Số dư ví không đủ. Vui lòng nạp thêm tiền.");
+        }
+
+        // Trừ tiền user
+        userWallet.setBalance(userWallet.getBalance() - totalPrice);
+        walletRepository.save(userWallet);
+
+        // Cộng tiền CCDV
+        Wallet providerWallet = walletRepository.findByUser(provider)
+                .orElseThrow(() -> new RuntimeException("Ví CCDV không tồn tại"));
+
+        providerWallet.setBalance(providerWallet.getBalance() + totalPrice);
+        walletRepository.save(providerWallet);
+
+        // -----------------------
+        // 📝 LƯU THUÊ
+        // -----------------------
+
         HireSession hire = new HireSession();
         hire.setUser(user);
         hire.setCcdv(provider);
         hire.setStartTime(startTime);
         hire.setEndTime(endTime);
-        hire.setAddress(request.getAddress());
         hire.setStatus("PENDING");
+        hire.setAddress(request.getAddress());
+        hire.setTotalPrice(totalPrice);
         hire.setCreatedAt(LocalDateTime.now());
         hire.setUpdatedAt(LocalDateTime.now());
-        hire.setUserReport(null);
-        hire.setTotalPrice(totalMoney.doubleValue());
 
         HireSession savedSession = hireSessionRepository.save(hire);
 
-        // 6. Lưu các dịch vụ được thuê (chỉ lưu liên kết)
-        for (CcdvServiceDetail detail : details) {
-            HireSessionCcdvservicedetail hd = new HireSessionCcdvservicedetail();
-            hd.setHireSession(savedSession);
-            hd.setCcdvServiceDetail(detail);
-            hireSessionDetailRepository.save(hd);
+        for (CcdvServiceDetail d : details) {
+            HireSessionCcdvservicedetail link = new HireSessionCcdvservicedetail();
+            link.setHireSession(savedSession);
+            link.setCcdvServiceDetail(d);
+            hireSessionDetailRepository.save(link);
         }
 
         return savedSession;
