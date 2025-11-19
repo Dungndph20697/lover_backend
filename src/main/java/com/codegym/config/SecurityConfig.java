@@ -81,7 +81,7 @@ public class SecurityConfig {
                         .requestMatchers("/api/hire/create").hasRole("USER")
 
                         .requestMatchers("/api/revenue/**").permitAll()
-                        .requestMatchers("/api/users/top-ccdv-view").permitAll()
+                        .requestMatchers("/api/toplover/top-ccdv-view").permitAll()
                         .requestMatchers("/api/home/top-ccdv").permitAll()
 
                         .requestMatchers("/api/ccdv-profiles/update/**").hasRole("SERVICE_PROVIDER")
