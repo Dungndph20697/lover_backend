@@ -1,6 +1,7 @@
 package com.codegym.service.interfaceService;
 
 import com.codegym.dto.CcdvProfileDTO;
+import com.codegym.dto.CcdvProfileResponse;
 import com.codegym.dto.LatestProviderDTO;
 import com.codegym.model.CcdvProfile;
 
@@ -12,6 +13,7 @@ public interface CcdvProfileService {
     CcdvProfile saveProfile(CcdvProfileDTO dto) throws IOException;
     CcdvProfile updateProfile(Long profileId, CcdvProfileDTO dto) throws IOException;
     List<LatestProviderDTO> getLatestProviders(int limit);
+    CcdvProfileResponse getProfileById(Long id);
 
 
 }

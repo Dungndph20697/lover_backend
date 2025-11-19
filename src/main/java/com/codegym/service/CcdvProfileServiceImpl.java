@@ -3,6 +3,7 @@ package com.codegym.service;
 import com.cloudinary.Cloudinary;
 import com.cloudinary.utils.ObjectUtils;
 import com.codegym.dto.CcdvProfileDTO;
+import com.codegym.dto.CcdvProfileResponse;
 import com.codegym.dto.LatestProviderDTO;
 import com.codegym.model.CcdvProfile;
 import com.codegym.model.User;
@@ -16,6 +17,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.Map;
 
@@ -128,5 +130,46 @@ public class CcdvProfileServiceImpl implements CcdvProfileService {
                         p.getGender()
                 ))
                 .toList();
+    }
+    @Override
+    public CcdvProfileResponse getProfileById(Long id) {
+        CcdvProfile profile = ccdvProfileRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Profile not found"));
+
+        // Tăng số lượt xem
+        profile.setViewCount(profile.getViewCount() == null ? 1 : profile.getViewCount() + 1);
+        ccdvProfileRepository.save(profile);
+
+        return convertToDto(profile);
+    }
+    private CcdvProfileResponse convertToDto(CcdvProfile p) {
+        CcdvProfileResponse dto = new CcdvProfileResponse();
+
+        dto.setId(p.getId());
+        dto.setUserId(p.getUser().getId());
+        dto.setFullName(p.getFullName());
+        dto.setYearOfBirth(p.getYearOfBirth());
+        dto.setGender(p.getGender());
+        dto.setCity(p.getCity());
+        dto.setNationality(p.getNationality());
+
+        dto.setAvatar(p.getAvatar());
+        dto.setPortrait1(p.getPortrait1());
+        dto.setPortrait2(p.getPortrait2());
+        dto.setPortrait3(p.getPortrait3());
+
+        dto.setHeight(p.getHeight());
+        dto.setWeight(p.getWeight());
+
+        dto.setHobbies(p.getHobbies());
+        dto.setDescription(p.getDescription());
+        dto.setRequirement(p.getRequirement());
+        dto.setFacebookLink(p.getFacebookLink());
+
+        dto.setJoinDate(p.getJoinDate().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm")));
+        dto.setHireCount(p.getHireCount() == null ? 0 : p.getHireCount());
+        dto.setViewCount(p.getViewCount() == null ? 0 : p.getViewCount());
+
+        return dto;
     }
 }
