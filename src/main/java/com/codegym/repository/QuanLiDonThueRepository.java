@@ -33,7 +33,7 @@ public interface QuanLiDonThueRepository extends JpaRepository<HireSession, Long
     SELECT new com.codegym.dto.TopFrequentCustomerDTO(h.user, COUNT(h))
     FROM HireSession h
     WHERE h.ccdv.id = :ccdvId
-      AND h.status = 'DONE'
+      AND h.status = 'COMPLETED'
     GROUP BY h.user
     ORDER BY COUNT(h) DESC
     """)
@@ -47,7 +47,7 @@ public interface QuanLiDonThueRepository extends JpaRepository<HireSession, Long
     SELECT new com.codegym.dto.TopRecentCustomerDTO(h.user, MAX(h.startTime))
     FROM HireSession h
     WHERE h.ccdv.id = :ccdvId
-      AND h.status = 'DONE'
+      AND h.status = 'COMPLETED'
     GROUP BY h.user
     ORDER BY MAX(h.startTime) DESC
     """)
