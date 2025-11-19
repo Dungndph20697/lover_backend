@@ -12,7 +12,7 @@ import org.springframework.stereotype.Repository;
 import java.util.List;
 
 @Repository
-public class TopLoverRepository extends JpaRepository<User, Long> {
+public interface TopLoverRepository extends JpaRepository<User, Long> {
     @Modifying
     @Query("UPDATE User u SET u.viewCount = u.viewCount + 1 WHERE u.id = :id")
     void increaseView(@Param("id") Long id);
