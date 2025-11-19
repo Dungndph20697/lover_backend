@@ -100,22 +100,4 @@ public class UserService {
     public User save(User user) {
         return userRepository.save(user);
     }
-
-
-
-
-
-    public void increaseView(Long id) {
-        userRepository.increaseView(id);
-    }
-
-    public User findById(Long id) {
-        return userRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("User not found"));
-    }
-
-    public List<TopCcdvDTO> getTop6CcdvByView() {
-        Long ccdvRoleId = 2L; // role của CCDV
-        return userRepository.findTopCcdvWithProfile(ccdvRoleId, PageRequest.of(0, 6));
-    }
 }

@@ -47,7 +47,7 @@ public class SecurityConfig {
                         .requestMatchers("/api/users/register", "/api/users/login").permitAll()
                         .requestMatchers("/api/users/exists/**").permitAll()
                         .requestMatchers("/api/users/check-email/**").permitAll()
-                        .requestMatchers("/api/users/check-email/**").permitAll()
+                        .requestMatchers("/api/users/check-phone/**").permitAll()
                         .requestMatchers("/api/users/profiles/**").permitAll()
                         .requestMatchers("/api/users/service/**").permitAll()
                         .requestMatchers("/api/users/check-cccd/**").permitAll()
@@ -85,7 +85,6 @@ public class SecurityConfig {
                         .requestMatchers("/api/users/top-ccdv-view").permitAll()
                         .requestMatchers("/api/home/top-ccdv").permitAll()
 
-                        .requestMatchers("/api/ccdv-profiles/user/**").hasRole("SERVICE_PROVIDER")
                         .requestMatchers("/api/ccdv-profiles/update/**").hasRole("SERVICE_PROVIDER")
                         .requestMatchers("/api/ccdv-profiles/toggle-status/**").hasRole("SERVICE_PROVIDER")
                         .requestMatchers("/api/wallet/topup").hasAnyRole("USER", "SERVICE_PROVIDER")
