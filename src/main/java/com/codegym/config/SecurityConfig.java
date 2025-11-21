@@ -85,6 +85,9 @@ public class SecurityConfig {
                         // endpoint duyệt rút tiền chỉ dành cho ADMIN
                         .requestMatchers("/api/admin/withdraw/**").hasRole("ADMIN")
 
+                        .requestMatchers("/api/ccdv/search").permitAll()
+                        .requestMatchers("/api/ccdv/cities").permitAll()
+
 
                         .requestMatchers("/api/ccdv/**").hasRole("SERVICE_PROVIDER")
                         .requestMatchers("/api/hire/create").hasRole("USER")
