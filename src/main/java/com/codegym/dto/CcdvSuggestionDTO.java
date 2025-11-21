@@ -20,4 +20,5 @@ public class CcdvSuggestionDTO {
     private String description;
     private List<ServiceVipDTO> services; // up to 3 random
     private BigDecimal startingPricePerHour; // ví dụ: min price among services
+    private BigDecimal totalPrice;
 }
