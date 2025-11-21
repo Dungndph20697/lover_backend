@@ -2,6 +2,7 @@ package com.codegym.repository;
 
 import com.codegym.model.CcdvProfile;
 import com.codegym.model.enums.ProfileStatus;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.data.jpa.repository.Query;
@@ -29,4 +30,7 @@ public interface CcdvProfileRepository extends JpaRepository<CcdvProfile, Long>,
     @Query("SELECT DISTINCT c.city FROM CcdvProfile c WHERE c.city IS NOT NULL")
     List<String> findDistinctCities();
 
+    // Lấy VIP active, sort theo vipStartTime desc, dùng Pageable để limit 6
+    @Query("SELECT p FROM CcdvProfile p WHERE p.status = :status AND p.vip = true ORDER BY p.vipStartTime DESC")
+    List<CcdvProfile> findVipProfilesByStatusOrderByVipStartTimeDesc(ProfileStatus status, Pageable pageable);
 }
