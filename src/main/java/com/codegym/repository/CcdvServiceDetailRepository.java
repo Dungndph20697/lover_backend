@@ -28,4 +28,7 @@ public interface CcdvServiceDetailRepository extends JpaRepository<CcdvServiceDe
     void updatePriceByUserAndService(Long userId, Long serviceId, BigDecimal price);
 
     List<CcdvServiceDetail> findByIdIn(Iterable<Long> ids);
+
+    @Query("SELECT d FROM CcdvServiceDetail d WHERE d.user.id = :ccdvId")
+    List<CcdvServiceDetail> findByCcdvId(Long ccdvId);
 }
