@@ -88,6 +88,7 @@ public class SecurityConfig {
                         .requestMatchers("/api/ccdv/search").permitAll()
                         .requestMatchers("/api/ccdv/cities").permitAll()
                         .requestMatchers("/api/ccdv/suggestion-vip").permitAll()
+                        .requestMatchers("/api/ccdv/list-item").permitAll()
 
 
                         .requestMatchers("/api/ccdv/**").hasRole("SERVICE_PROVIDER")

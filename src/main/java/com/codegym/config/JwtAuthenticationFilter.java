@@ -43,6 +43,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                 || path.startsWith("/api/users/top-ccdv-view")
                 || path.startsWith("/api/ccdv/search")
                 || path.startsWith("/api/ccdv/suggestion-vip")
+                || path.startsWith("/api/ccdv/list-item")
                 || path.startsWith("/api/users/profiles")) {
 
             filterChain.doFilter(request, response);
