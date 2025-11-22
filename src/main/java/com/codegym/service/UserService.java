@@ -10,7 +10,6 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.PageRequest;
 
 import com.codegym.repository.WalletRepository;
-import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
@@ -27,6 +26,9 @@ import java.util.Optional;
 public class UserService {
     @Autowired
     private WalletRepository walletRepository;
+
+    @Autowired
+    private EmailNotificationService emailNotificationService;
 
     private final UserRepository userRepository;
     private final BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
@@ -48,6 +50,9 @@ public class UserService {
             user.setRole(role);
         }
 
+        // thêm trường nếu là tài khoản mới -> chưa kích hoạt
+        user.setIsActive(false);
+
         // Nếu nickname trống → dùng họ + tên
         if (user.getNickname() == null || user.getNickname().isBlank()) {
             user.setNickname(user.getFirstName() + " " + user.getLastName());
@@ -64,6 +69,13 @@ public class UserService {
 
         //Lưu lại mã vào DB
         userRepository.save(savedUser);
+
+        // -------------------------------
+        // 9. GỬI EMAIL THÔNG BÁO ĐĂNG KÝ
+        // -------------------------------
+        emailNotificationService.sendRegisterSuccessEmail(
+                savedUser.getEmail(),
+                savedUser.getFirstName());
 
         response.put("success", true);
         response.put("message", "Đăng ký thành công");

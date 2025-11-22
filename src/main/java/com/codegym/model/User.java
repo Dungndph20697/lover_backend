@@ -65,4 +65,7 @@ public class User {
     @Column(name = "view_count")
     private Integer viewCount = 0;
 
+    @Column(name = "is_active")
+    private Boolean isActive = false;
+
 }

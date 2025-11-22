@@ -2,6 +2,7 @@ package com.codegym.repository;
 
 import com.codegym.dto.TopCcdvDTO;
 import com.codegym.model.User;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
@@ -35,4 +36,7 @@ public interface UserRepository extends JpaRepository<User, Long> {
             "WHERE u.role.id = :roleId " +
             "ORDER BY u.viewCount DESC")
     List<TopCcdvDTO> findTopCcdvWithProfile(@Param("roleId") Long roleId, Pageable pageable);
+
+    // lấy danh sách tài khoản có phân trang
+    Page<User> findAll(Pageable pageable);
 }
