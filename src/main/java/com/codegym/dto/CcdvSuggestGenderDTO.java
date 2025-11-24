@@ -12,13 +12,13 @@ import java.util.List;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-public class CcdvFindByCity {
+public class CcdvSuggestGenderDTO {
     private Long profileId;
     private Long userId;
     private String name;
     private String avatar;
     private String description;
-    private String city;
+    private String gender;
     private List<ServiceVipDTO> services; // up to 3 random
     private BigDecimal startingPricePerHour; // ví dụ: min price among services
     private BigDecimal totalPrice;

@@ -2,8 +2,10 @@ package com.codegym.controller;
 
 import com.codegym.dto.CcdvFindByCity;
 import com.codegym.dto.CcdvProfileHomeDTO;
+import com.codegym.dto.CcdvSuggestionDTO;
 import com.codegym.service.CcdvFindByCityService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -18,7 +20,7 @@ public class CcdvFindByCityController {
     private CcdvFindByCityService service;
 
     @GetMapping("/city")
-    public List<CcdvFindByCity> getAllCcdv() {
-        return service.getAllActiveCcdv();
+    public ResponseEntity<List<CcdvFindByCity>> getAllCcdv(@RequestParam(required = false) String city) {
+        return ResponseEntity.ok(service.getAllActiveCcdv(city));
     }
 }
