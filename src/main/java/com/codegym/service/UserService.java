@@ -7,12 +7,13 @@ import com.codegym.model.User;
 
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 
 import com.codegym.repository.WalletRepository;
-import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 
+import org.springframework.data.domain.Pageable;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -27,6 +28,9 @@ import java.util.Optional;
 public class UserService {
     @Autowired
     private WalletRepository walletRepository;
+
+    @Autowired
+    private EmailNotificationService emailNotificationService;
 
     private final UserRepository userRepository;
     private final BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
@@ -48,6 +52,9 @@ public class UserService {
             user.setRole(role);
         }
 
+        // thêm trường nếu là tài khoản mới -> chưa kích hoạt
+        user.setIsActive(false);
+
         // Nếu nickname trống → dùng họ + tên
         if (user.getNickname() == null || user.getNickname().isBlank()) {
             user.setNickname(user.getFirstName() + " " + user.getLastName());
@@ -64,6 +71,13 @@ public class UserService {
 
         //Lưu lại mã vào DB
         userRepository.save(savedUser);
+
+        // -------------------------------
+        // 9. GỬI EMAIL THÔNG BÁO ĐĂNG KÝ
+        // -------------------------------
+        emailNotificationService.sendRegisterSuccessEmail(
+                savedUser.getEmail(),
+                savedUser.getFirstName());
 
         response.put("success", true);
         response.put("message", "Đăng ký thành công");
@@ -114,6 +128,28 @@ public class UserService {
     public User save(User user) {
         return userRepository.save(user);
     }
+
+    // lấy danh sách người dùng
+    public Page<User> getVipUsers(int page, int size){
+        Pageable pageable = PageRequest.of(page, size);
+        return userRepository.findByIsVipTrue(pageable);
+    }
+
+    // lấy danh sách ccdv vip
+    public Page<User> getVipCcdv(int page, int size){
+        Pageable pageable = PageRequest.of(page, size);
+        Long ccdvRoleId = 2L;
+        return userRepository.findByRole_IdAndIsVipTrue(ccdvRoleId, pageable);
+    }
+
+    // chức năng cập nhập VIP
+    public User updateVipStatus(Long userId, Boolean isVip) {
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new RuntimeException("User không tồn tại với id: " + userId));
+        user.setIsVip(isVip);
+        return userRepository.save(user);
+    }
+
 
 
 
