@@ -38,4 +38,18 @@ public class Report {
     private String reportContent;
 
     private LocalDateTime createdAt;
+
+    // Thêm field status
+    @Column(name = "status")
+    private String status; // PENDING, APPROVED, REJECTED
+
+    @PrePersist
+    protected void onCreate() {
+        if (status == null) {
+            status = "PENDING";
+        }
+        if (createdAt == null) {
+            createdAt = LocalDateTime.now();
+        }
+    }
 }
