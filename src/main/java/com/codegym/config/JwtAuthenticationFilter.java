@@ -1,7 +1,9 @@
 package com.codegym.config;
 
+import com.codegym.repository.UserRepository;
 import com.codegym.service.CustomUserDetailsService;
 import com.codegym.service.JwtService;
+import com.codegym.service.UserService;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -14,6 +16,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import java.io.IOException;
+import java.time.LocalDateTime;
 
 @Component
 @RequiredArgsConstructor
@@ -21,6 +24,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
     private final JwtService jwtService;
     private final CustomUserDetailsService userDetailsService;
+    private final UserRepository userRepository;
 
     @Override
     protected void doFilterInternal(HttpServletRequest request,
@@ -76,6 +80,13 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                                 userDetails, null, userDetails.getAuthorities());
 
                 SecurityContextHolder.getContext().setAuthentication(authToken);
+
+                // thêm chức năng trạng thái hoạt động của user
+                userRepository.findByUsername(username).ifPresent(user -> {
+                    user.setLastActivity(LocalDateTime.now());
+                    user.setIsOnline(true); // nếu bạn có trường online
+                    userRepository.save(user);
+                });
             }
         }
 

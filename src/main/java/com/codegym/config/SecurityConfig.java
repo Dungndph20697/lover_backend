@@ -51,6 +51,7 @@ public class SecurityConfig {
                         .requestMatchers("/api/users/profiles/**").permitAll()
                         .requestMatchers("/api/users/service/**").permitAll()
                         .requestMatchers("/api/users/check-cccd/**").permitAll()
+                        .requestMatchers("/api/user/hire-sessions/**").permitAll()
 
                         // Test email endpoints
                         .requestMatchers("/api/ccdv/hire-sessions/test-email").permitAll()
@@ -101,6 +102,12 @@ public class SecurityConfig {
                         .requestMatchers("/api/hire/create").hasRole("USER")
 
                         .requestMatchers("/api/admin/**").hasRole("ADMIN")
+                        .requestMatchers("/api/user-activity/admin/**").hasRole("ADMIN")
+
+                        // User xem trạng thái hoạt động của người khác
+                        .requestMatchers("/api/user-activity/status/**")
+                        .hasAnyRole("USER", "SERVICE_PROVIDER", "ADMIN")
+
 
                         .anyRequest().authenticated()
                 )
