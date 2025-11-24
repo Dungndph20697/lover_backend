@@ -39,4 +39,11 @@ public interface UserRepository extends JpaRepository<User, Long> {
 
     // lấy danh sách tài khoản có phân trang
     Page<User> findAll(Pageable pageable);
+
+    // lấy danh sách user VIP
+    Page<User> findByIsVipTrue(Pageable pageable);
+
+    // lấy danh sách ccdv vip (id = 2)
+    Page<User> findByRole_IdAndIsVipTrue(Long roleId, Pageable pageable);
+
 }
