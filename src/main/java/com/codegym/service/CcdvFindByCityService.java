@@ -34,6 +34,7 @@ public class CcdvFindByCityService {
         List<CcdvFindByCity> result = new ArrayList<>();
         int LIMIT = 12;
 
+        //city ko đc null
         if (city != null && !city.isBlank()) {
             profiles = ccdvRepository.findTop12ByCityAndStatusOrderByJoinDateDesc(
                     city,
