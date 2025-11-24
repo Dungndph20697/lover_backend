@@ -98,10 +98,7 @@ public class SecurityConfig {
                         .requestMatchers("/api/ccdv/**").hasRole("SERVICE_PROVIDER")
                         .requestMatchers("/api/hire/create").hasRole("USER")
 
-                        // admin
                         .requestMatchers("/api/admin/**").hasRole("ADMIN")
-
-
 
                         .anyRequest().authenticated()
                 )
