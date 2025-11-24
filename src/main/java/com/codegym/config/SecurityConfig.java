@@ -95,6 +95,8 @@ public class SecurityConfig {
                         .requestMatchers("/api/ccdv/list-item").permitAll()
                         .requestMatchers("/api/recommendation/**").permitAll()
 
+                        .requestMatchers("/api/ccdv/city").permitAll()
+
                         .requestMatchers("/api/ccdv/**").hasRole("SERVICE_PROVIDER")
                         .requestMatchers("/api/hire/create").hasRole("USER")
 
