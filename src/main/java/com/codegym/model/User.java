@@ -6,6 +6,8 @@ import jakarta.validation.constraints.*;
 import lombok.AllArgsConstructor;
 import lombok.NoArgsConstructor;
 
+import java.time.LocalDateTime;
+
 @Getter
 @Setter
 @AllArgsConstructor
@@ -72,5 +74,12 @@ public class User {
     // thêm trường vip cho tài khoản
     @Column(name = "is_vip")
     private Boolean isVip = false;
+
+    // thêm trường lastActivity trạng thái của user
+    @Column(name = "last_activity")
+    private LocalDateTime lastActivity;
+    @Column(name = "is_online")
+    private Boolean isOnline = false;
+
 
 }

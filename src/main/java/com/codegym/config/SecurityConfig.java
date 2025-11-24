@@ -100,6 +100,12 @@ public class SecurityConfig {
 
                         // admin
                         .requestMatchers("/api/admin/**").hasRole("ADMIN")
+                        .requestMatchers("/api/user-activity/admin/**").hasRole("ADMIN")
+
+                        // User xem trạng thái hoạt động của người khác
+                        .requestMatchers("/api/user-activity/status/**")
+                        .hasAnyRole("USER", "SERVICE_PROVIDER", "ADMIN")
+
 
 
 
