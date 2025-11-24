@@ -25,6 +25,7 @@ public class CcdvFindByCityService {
 
     private final Random random = new Random();
 
+    //find all
     public List<CcdvFindByCity> getAllActiveCcdv() {
         List<CcdvProfile> profiles = ccdvRepository.findByStatus(ProfileStatus.ACTIVE);
 
