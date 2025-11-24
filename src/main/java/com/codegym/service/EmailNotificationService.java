@@ -230,4 +230,64 @@ public class EmailNotificationService {
             System.out.println("Lỗi gửi mail từ chối rút: " + e.getMessage());
         }
     }
+
+    // gửi email thông báo đăng ký tài khoản thành công
+    public void sendRegisterSuccessEmail(String email, String name){
+        try {
+            MimeMessage message = mailSender.createMimeMessage();
+            MimeMessageHelper helper = new MimeMessageHelper(message, true, "UTF-8");
+
+            helper.setTo(email);
+            helper.setSubject("🎉 Đăng ký tài khoản thành công!");
+
+            String html = """
+            <html>
+            <body style='font-family:Arial'>
+                <h2 style='color:#4C8BF5;'>🎉 Chúc mừng bạn đã đăng ký thành công!</h2>
+                <p>Xin chào <b>%s</b>,</p>
+                <p>Bạn đã hoàn tất đăng ký tài khoản trên hệ thống.</p>
+                <p><b>Vui lòng chờ Admin xét duyệt để có thể đăng nhập.</b></p>
+                <p>Cảm ơn bạn đã tin tưởng sử dụng dịch vụ ❤️</p>
+            </body>
+            </html>
+        """.formatted(name);
+
+            helper.setText(html, true);
+            mailSender.send(message);
+
+        } catch (Exception e) {
+            System.out.println("Lỗi gửi email đăng ký: " + e.getMessage());
+        }
+    }
+
+    // guiwr email khi admin duyệt tài khoản
+    public void sendAccountApprovedEmail(String email, String name){
+        try {
+            MimeMessage message = mailSender.createMimeMessage();
+            MimeMessageHelper helper =
+                    new MimeMessageHelper(message, true, "UTF-8");
+
+            helper.setTo(email);
+            helper.setSubject("Tài khoản của bạn đã được duyệt!");
+
+            String html = """
+            <html>
+            <body style='font-family:Arial'>
+                <h2 style='color:#4CAF50;'>✔ Tài khoản đã được duyệt!</h2>
+                <p>Xin chào <b>%s</b>,</p>
+                <p>Admin đã duyệt tài khoản của bạn.</p>
+                <p>Bây giờ bạn có thể đăng nhập và sử dụng hệ thống.</p>
+                <br/>
+                <i>Chúc bạn có trải nghiệm tuyệt vời ❤️</i>
+            </body>
+            </html>
+        """.formatted(name);
+
+            helper.setText(html, true);
+            mailSender.send(message);
+
+        } catch (Exception e) {
+            System.out.println("Lỗi gửi mail duyệt tài khoản: " + e.getMessage());
+        }
+    }
 }

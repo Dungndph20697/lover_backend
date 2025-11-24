@@ -14,7 +14,6 @@ import java.util.Map;
 
 @RestController
 @RequestMapping("/api/ccdv-profiles")
-@CrossOrigin("*")
 public class DangThongTinCaNhanController {
     @Autowired
     private CcdvProfileServiceImpl ccdvProfileService;

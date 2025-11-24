@@ -3,7 +3,9 @@ package com.codegym.repository;
 import com.codegym.dto.CcdvDetailAdminDTO;
 import com.codegym.model.CcdvProfile;
 import com.codegym.model.enums.ProfileStatus;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
@@ -12,7 +14,7 @@ import java.util.List;
 import java.util.Optional;
 
 
-public interface CcdvProfileRepository extends JpaRepository<CcdvProfile, Long> {
+public interface CcdvProfileRepository extends JpaRepository<CcdvProfile, Long>, JpaSpecificationExecutor<CcdvProfile> {
     // kiểm tra xem user có profile chưa
     boolean existsByUserId(Long userId);
 
@@ -35,4 +37,19 @@ public interface CcdvProfileRepository extends JpaRepository<CcdvProfile, Long> 
             "FROM CcdvProfile p JOIN p.user u " +
             "WHERE u.id = :userId AND u.role.name = 'SERVICE_PROVIDER'")
     CcdvDetailAdminDTO getCcdvDetail(@Param("userId") Long userId);
+
+    @Query("SELECT DISTINCT c.city FROM CcdvProfile c WHERE c.city IS NOT NULL")
+    List<String> findDistinctCities();
+
+    // Lấy VIP active, sort theo vipStartTime desc, dùng Pageable để limit 6
+    @Query("""
+        SELECT p
+        FROM CcdvProfile p
+        JOIN p.user u
+        WHERE p.status = :status
+          AND u.isVip = true
+        ORDER BY p.vipStartTime DESC
+    """)
+    List<CcdvProfile> findVipProfilesByStatusOrderByVipStartTimeDesc(ProfileStatus status, Pageable pageable);
+
 }

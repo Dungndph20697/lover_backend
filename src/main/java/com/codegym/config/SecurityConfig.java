@@ -59,22 +59,47 @@ public class SecurityConfig {
                         .requestMatchers("/api/ccdv/hire-sessions/**").permitAll()
                         .requestMatchers("/ws/**").permitAll()
                         .requestMatchers("/api/messages/**").permitAll()
+                        .requestMatchers("/api/admin/hire-sessions/**").hasRole("ADMIN")
+                        .requestMatchers(HttpMethod.GET, "/api/admin/revenues").hasRole("ADMIN")
+                        .requestMatchers(HttpMethod.GET, "/api/admin/revenues/**").hasRole("ADMIN")
+                        .requestMatchers(HttpMethod.GET, "/api/admin/revenues/stats").hasRole("ADMIN")
 
                         .requestMatchers("/api/sepay/webhook").permitAll()
 
 
                         .requestMatchers("/api/ccdv-profiles/create").hasRole("SERVICE_PROVIDER")
 
-                        .requestMatchers("/api/revenue/**").permitAll()
-                        .requestMatchers("/api/users/top-ccdv-view").permitAll()
-                        .requestMatchers("/api/home/top-ccdv").permitAll()
 
                         .requestMatchers("/api/ccdv-profiles/user/**").hasRole("SERVICE_PROVIDER")
                         .requestMatchers("/api/ccdv-profiles/update/**").hasRole("SERVICE_PROVIDER")
                         .requestMatchers("/api/ccdv-profiles/toggle-status/**").hasRole("SERVICE_PROVIDER")
-                        .requestMatchers("/api/wallet/topup").hasAnyRole("U?????????????????????SERVICE_PROVIDER")
+                        .requestMatchers("/api/wallet/topup").hasAnyRole("USER", "SERVICE_PROVIDER")
                         .requestMatchers("/api/hire/create").hasRole("USER")
+
+                        .requestMatchers("/api/revenue/**").permitAll()
+                        .requestMatchers("/api/toplover/top-ccdv-view").permitAll()
+                        .requestMatchers("/api/home/top-ccdv").permitAll()
+
+                        .requestMatchers("/api/ccdv-profiles/update/**").hasRole("SERVICE_PROVIDER")
+                        .requestMatchers("/api/ccdv-profiles/toggle-status/**").hasRole("SERVICE_PROVIDER")
+                        .requestMatchers("/api/wallet/topup").hasAnyRole("USER", "SERVICE_PROVIDER")
+                        .requestMatchers("/api/wallet/balance").hasAnyRole("USER", "SERVICE_PROVIDER")
+                        // endpoint rút tiền chỉ dành cho SERVICE_PROVIDER
+                        .requestMatchers("/api/withdraw/**").hasRole("SERVICE_PROVIDER")
+                        // endpoint duyệt rút tiền chỉ dành cho ADMIN
+                        .requestMatchers("/api/admin/withdraw/**").hasRole("ADMIN")
+
+                        .requestMatchers("/api/ccdv/search").permitAll()
+                        .requestMatchers("/api/ccdv/cities").permitAll()
+                        .requestMatchers("/api/ccdv/suggestion-vip").permitAll()
+                        .requestMatchers("/api/ccdv/list-item").permitAll()
+                        .requestMatchers("/api/recommendation/**").permitAll()
+
+                        .requestMatchers("/api/ccdv/**").hasRole("SERVICE_PROVIDER")
+                        .requestMatchers("/api/hire/create").hasRole("USER")
+
                         .requestMatchers("/api/admin/**").hasRole("ADMIN")
+
                         .anyRequest().authenticated()
                 )
                 .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class);

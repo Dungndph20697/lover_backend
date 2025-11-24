@@ -65,7 +65,16 @@ public class User {
     @Column(name = "view_count")
     private Integer viewCount = 0;
 
+
     @Column(length = 20, nullable = false)
     private String status = "ACTIVE";
+
+    // thêm trường isActive để xác định tài khoản đã được admin duyệt hay chưa
+    @Column(name = "is_active")
+    private Boolean isActive = false;
+
+    // thêm trường vip cho tài khoản
+    @Column(name = "is_vip")
+
 
 }

@@ -1,10 +1,10 @@
 package com.codegym.controller;
 
-
 import com.codegym.dto.TopCcdvDTO;
 
 import com.codegym.model.CcdvServiceDetail;
 
+import com.codegym.model.CcdvServiceDetail;
 import com.codegym.model.User;
 import com.codegym.service.JwtService;
 import com.codegym.service.UserService;
@@ -24,7 +24,6 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 import java.util.Map;
 
-@CrossOrigin(origins = "http://localhost:5173")
 @RestController
 @RequestMapping("/api/users")
 @RequiredArgsConstructor
@@ -50,6 +49,7 @@ public class UserController {
         String username = request.get("username");
         String password = request.get("password");
 
+
         User user = userService.findUserByUsername(username).get();
         if (!"ACTIVE".equalsIgnoreCase(user.getStatus())) {
             System.out.println("aaaaaaaaaaaaaaa"+user.getStatus());
@@ -57,10 +57,26 @@ public class UserController {
                     .body(Map.of("success", false, "message", "Tài khoản đã bị khóa, vui lòng liên hệ Admin!"));
         }
 
+
+        // Kiểm tra username có tồn tại không
+        User user1 = userService.findUserByUsername(username)
+                .orElseThrow(() -> new RuntimeException("Sai username hoặc password"));
+
+        // Kiểm tra đã được Admin duyệt chưa
+        if (user1.getIsActive() == null || !user.getIsActive()) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN)
+                    .body(Map.of(
+                            "success", false,
+                            "message", "Tài khoản chưa được Admin duyệt"
+                    ));
+        }
+
+        // 3️⃣ Xác thực mật khẩu
         authenticationManager.authenticate(
                 new UsernamePasswordAuthenticationToken(username, password)
         );
 
+        // 4️⃣ Tạo JWT token
         UserDetails userDetails = userDetailsService.loadUserByUsername(username);
         String token = jwtService.generateToken(username);
 
@@ -106,6 +122,7 @@ public class UserController {
         return ResponseEntity.ok(exists);
     }
 
+    //
 
     @GetMapping("/me")
     public ResponseEntity<?> getCurrentUser(Authentication authentication) {
@@ -128,25 +145,6 @@ public class UserController {
         return ResponseEntity.ok(user);
     }
 
-    // API tăng view CCDV
-    @PostMapping("/{id}/view")
-    public ResponseEntity<?> increaseView(@PathVariable("id") Long id) {
-        userService.increaseView(id);
-        return ResponseEntity.ok("View updated");
-    }
-
-    // API lấy thông tin CCDV (nếu bạn cần)
-    @GetMapping("/{id}")
-    public ResponseEntity<User> getUser(@PathVariable("id") Long id) {
-        return ResponseEntity.ok(userService.findById(id));
-    }
-
-    @GetMapping("/top-ccdv-view")
-    public ResponseEntity<List<TopCcdvDTO>> getTopCcdvByView() {
-        List<TopCcdvDTO> top6 = userService.getTop6CcdvByView();
-        return ResponseEntity.ok(top6);
-    }
-
     @GetMapping("/service/{userId}")
     public ResponseEntity<?> getUserServices(@PathVariable Long userId) {
         try {
@@ -158,6 +156,4 @@ public class UserController {
                     .body("❌ Lỗi khi lấy danh sách dịch vụ: " + e.getMessage());
         }
     }
-
-
 }

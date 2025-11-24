@@ -13,7 +13,6 @@ import org.springframework.stereotype.Repository;
 
 import java.util.List;
 
-@Repository
 public interface QuanLiDonThueRepository extends JpaRepository<HireSession, Long> {
     
     // Lấy danh sách đơn thuê theo CCDV
