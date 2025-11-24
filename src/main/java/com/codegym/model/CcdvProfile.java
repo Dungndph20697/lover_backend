@@ -86,4 +86,10 @@ public class CcdvProfile {
     @Column(length = 20, nullable = false)
     private ProfileStatus status = ProfileStatus.ACTIVE; // mặc định là ACTIVE
 
+    // --- TRƯỜNG MỚI: setvip cho người ccdv
+    @Column(name = "vip", nullable = false)
+    private Boolean vip = false;
+
+    @Column(name = "vip_start_time")
+    private LocalDateTime vipStartTime;
 }

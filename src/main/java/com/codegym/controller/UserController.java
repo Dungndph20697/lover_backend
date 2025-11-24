@@ -1,10 +1,10 @@
 package com.codegym.controller;
 
-
 import com.codegym.dto.TopCcdvDTO;
 
 import com.codegym.model.CcdvServiceDetail;
 
+import com.codegym.model.CcdvServiceDetail;
 import com.codegym.model.User;
 import com.codegym.service.JwtService;
 import com.codegym.service.UserService;
@@ -24,7 +24,6 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 import java.util.Map;
 
-@CrossOrigin(origins = "http://localhost:5173")
 @RestController
 @RequestMapping("/api/users")
 @RequiredArgsConstructor
@@ -114,6 +113,7 @@ public class UserController {
         return ResponseEntity.ok(exists);
     }
 
+    //
 
     @GetMapping("/me")
     public ResponseEntity<?> getCurrentUser(Authentication authentication) {
@@ -136,25 +136,6 @@ public class UserController {
         return ResponseEntity.ok(user);
     }
 
-    // API tăng view CCDV
-    @PostMapping("/{id}/view")
-    public ResponseEntity<?> increaseView(@PathVariable("id") Long id) {
-        userService.increaseView(id);
-        return ResponseEntity.ok("View updated");
-    }
-
-    // API lấy thông tin CCDV (nếu bạn cần)
-    @GetMapping("/{id}")
-    public ResponseEntity<User> getUser(@PathVariable("id") Long id) {
-        return ResponseEntity.ok(userService.findById(id));
-    }
-
-    @GetMapping("/top-ccdv-view")
-    public ResponseEntity<List<TopCcdvDTO>> getTopCcdvByView() {
-        List<TopCcdvDTO> top6 = userService.getTop6CcdvByView();
-        return ResponseEntity.ok(top6);
-    }
-
     @GetMapping("/service/{userId}")
     public ResponseEntity<?> getUserServices(@PathVariable Long userId) {
         try {
@@ -166,6 +147,4 @@ public class UserController {
                     .body("❌ Lỗi khi lấy danh sách dịch vụ: " + e.getMessage());
         }
     }
-
-
 }
