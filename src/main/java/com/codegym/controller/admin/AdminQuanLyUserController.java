@@ -18,7 +18,7 @@ public class AdminQuanLyUserController {
     private IAdminService adminService;
 
     // Danh sách người dùng (trừ ADMIN)
-    @GetMapping("/users")
+    @GetMapping("/list-users")
     public ResponseEntity<List<UserListDTO>> getUsers() {
         return ResponseEntity.ok(adminService.getAllUsersExceptAdmin());
     }

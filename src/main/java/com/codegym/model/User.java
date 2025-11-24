@@ -75,6 +75,6 @@ public class User {
 
     // thêm trường vip cho tài khoản
     @Column(name = "is_vip")
-
+    private Boolean isVip = false;
 
 }
