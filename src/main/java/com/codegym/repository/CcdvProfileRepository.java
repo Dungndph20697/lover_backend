@@ -31,6 +31,13 @@ public interface CcdvProfileRepository extends JpaRepository<CcdvProfile, Long>,
     List<String> findDistinctCities();
 
     // Lấy VIP active, sort theo vipStartTime desc, dùng Pageable để limit 6
-    @Query("SELECT p FROM CcdvProfile p WHERE p.status = :status AND p.vip = true ORDER BY p.vipStartTime DESC")
+    @Query("""
+        SELECT p
+        FROM CcdvProfile p
+        JOIN p.user u
+        WHERE p.status = :status
+          AND u.isVip = true
+        ORDER BY p.vipStartTime DESC
+    """)
     List<CcdvProfile> findVipProfilesByStatusOrderByVipStartTimeDesc(ProfileStatus status, Pageable pageable);
 }

@@ -62,12 +62,15 @@ public class CcdvSuggestionServiceImpl implements CcdvSuggestionService {
                     .filter(price -> price.compareTo(BigDecimal.ZERO) > 0)
                     .min(BigDecimal::compareTo);
 
-            BigDecimal totalPrice = services.stream()
+            BigDecimal totalPrice = picked.stream()
                     .map(CcdvServiceDetail::getServiceType)
                     .filter(Objects::nonNull)
                     .map(ServiceType::getPricePerHour)
                     .filter(Objects::nonNull)
+                    .filter(price -> price.compareTo(BigDecimal.ZERO) > 0)
                     .reduce(BigDecimal.ZERO, BigDecimal::add);
+
+            System.out.println(">>> PROFILE: " + p.getId() + " | " + p.getFullName() + " | totalPrice=" + totalPrice);
 
             CcdvSuggestionDTO dto = new CcdvSuggestionDTO();
             dto.setProfileId(p.getId());
