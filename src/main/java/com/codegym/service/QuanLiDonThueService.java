@@ -87,7 +87,6 @@ public class QuanLiDonThueService {
                 System.out.println("⚠️ Không có email của khách hàng để gửi thông báo");
             }
         } catch (Exception e) {
-            // Log lỗi nhưng vẫn trả về success vì đơn đã được xác nhận
             System.err.println("❌ Lỗi khi gửi email thông báo: " + e.getMessage());
             e.printStackTrace();
         }
@@ -129,7 +128,7 @@ public class QuanLiDonThueService {
         session.setUpdatedAt(LocalDateTime.now());
         quanLiDonThueRepository.save(session);
 
-        // Tăng số lần được thuê trong profile (đang bị trùng với duy)
+        // Tăng số lần được thuê trong profile
         Optional<CcdvProfile> profileOpt = Optional.ofNullable(ccdvProfileRepository.findByUserId(ccdvId));
         profileOpt.ifPresent(profile -> {
             profile.setHireCount(profile.getHireCount() + 1);
@@ -145,7 +144,8 @@ public class QuanLiDonThueService {
         return response;
     }
 
-    // BÁO CÁO VỀ KHÁCH HÀNG (COMPLETED -> REPORTED)
+    // BÁO CÁO VỀ KHÁCH HÀNG (COMPLETED -> REVIEW_REPORT)
+    // ✅ CHỈNH SỬA: Không hiển thị báo cáo cho người dùng cho đến khi admin duyệt
     @Transactional
     public Map<String, Object> reportClient(Long sessionId, Long ccdvId, String reportContent) {
         Map<String, Object> response = new HashMap<>();
@@ -177,65 +177,22 @@ public class QuanLiDonThueService {
             return response;
         }
 
-        // Lưu qua bảng hire_sessions
+        // ✅ GHI NHỚ NỘI DUNG TẠMTHỜI (chưa hiển thị cho user)
         session.setUserReport(reportContent);
-        session.setStatus("REPORTED");
+
+        // ✅ THAY ĐỔI: Trạng thái thành REVIEW_REPORT (đang chờ admin duyệt)
+        session.setStatus("REVIEW_REPORT");
         session.setUpdatedAt(LocalDateTime.now());
         quanLiDonThueRepository.save(session);
 
-        // Lưu bản báo cáo vào bảng reports
+        // Lưu bản báo cáo vào bảng reports với trạng thái PENDING
         Report savedReport = reportService.saveReport(session, reportContent);
 
         response.put("success", true);
-        response.put("message", "Báo cáo đã được gửi cho admin");
+        response.put("message", "Báo cáo đã được gửi cho admin - đang chờ duyệt");
         response.put("data", savedReport);
         return response;
     }
-
-
-//    @Transactional
-//    public Map<String, Object> reportClient(Long sessionId, Long ccdvId, String report) {
-//        Map<String, Object> response = new HashMap<>();
-//
-//        if (report == null || report.trim().isEmpty()) {
-//            response.put("success", false);
-//            response.put("message", "Nội dung báo cáo không được để trống");
-//            return response;
-//        }
-//
-//        Optional<HireSession> sessionOpt = quanLiDonThueRepository.findById(sessionId);
-//        if (sessionOpt.isEmpty()) {
-//            response.put("success", false);
-//            response.put("message", "Đơn thuê không tồn tại");
-//            return response;
-//        }
-//
-//        HireSession session = sessionOpt.get();
-//
-//        if (!session.getCcdv().getId().equals(ccdvId)) {
-//            response.put("success", false);
-//            response.put("message", "Bạn không có quyền xử lý đơn này");
-//            return response;
-//        }
-//
-//        if (!"COMPLETED".equals(session.getStatus())) {
-//            response.put("success", false);
-//            response.put("message", "Chỉ có thể báo cáo đơn ở trạng thái 'Đã hoàn thành'");
-//            return response;
-//        }
-//
-//        session.setUserReport(report);
-//        session.setStatus("REPORTED");
-//        session.setUpdatedAt(LocalDateTime.now());
-//        quanLiDonThueRepository.save(session);
-//
-//        String userEmail = session.getUser().getEmail();
-//        response.put("userEmail", userEmail);
-//        response.put("success", true);
-//        response.put("message", "Đơn thuê đã được xác nhận thành công");
-//
-//        return response;
-//    }
 
     // LẤY CHI TIẾT ĐƠN THUÊ
     public Map<String, Object> getSessionDetail(Long sessionId) {
@@ -254,6 +211,7 @@ public class QuanLiDonThueService {
     }
 
     // THỐNG KÊ
+    // ✅ CHỈNH SỬA: Thêm REVIEW_REPORT vào thống kê
     public Map<String, Object> getCcdvStatistics(Long ccdvId) {
         Map<String, Object> response = new HashMap<>();
         Map<String, Object> stats = new HashMap<>();
@@ -265,12 +223,13 @@ public class QuanLiDonThueService {
         long pending = allSessions.stream().filter(s -> "PENDING".equals(s.getStatus())).count();
         long accepted = allSessions.stream().filter(s -> "ACCEPTED".equals(s.getStatus())).count();
         long completed = allSessions.stream().filter(s -> "COMPLETED".equals(s.getStatus())).count();
+        long reviewReport = allSessions.stream().filter(s -> "REVIEW_REPORT".equals(s.getStatus())).count();
         long reported = allSessions.stream().filter(s -> "REPORTED".equals(s.getStatus())).count();
 
         // Tổng số đơn
         long tongDon = allSessions.size();
 
-        // Tổng thu nhập (chỉ tính các đơn COMPLETED hoặc REPORTED)
+        // ✅ CHỈNH SỬA: Chỉ tính doanh thu từ COMPLETED và REPORTED (báo cáo đã được duyệt)
         double tongThu = allSessions.stream()
                 .filter(s -> "COMPLETED".equals(s.getStatus()) || "REPORTED".equals(s.getStatus()))
                 .mapToDouble(HireSession::getTotalPrice)
@@ -282,6 +241,7 @@ public class QuanLiDonThueService {
         stats.put("pending", pending);
         stats.put("accepted", accepted);
         stats.put("completed", completed);
+        stats.put("reviewReport", reviewReport);
         stats.put("reported", reported);
 
         response.put("success", true);
@@ -290,7 +250,7 @@ public class QuanLiDonThueService {
         return response;
     }
 
-    // CHỈNH SỬA PHẢN HỒI VỀ NGƯỜI THUÊ (chỉ khi đơn ở trạng thái COMPLETED)
+    // CHỈNH SỬA PHẢN HỒI VỀ NGƯỜI THUÊ (chỉ khi đơn ở trạng thái COMPLETED hoặc REVIEW_REPORT)
     @Transactional
     public Map<String, Object> updateUserFeedback(Long sessionId, Long ccdvId, String feedback) {
         Map<String, Object> response = new HashMap<>();
@@ -317,10 +277,10 @@ public class QuanLiDonThueService {
             return response;
         }
 
-        // Chỉ cho phép chỉnh sửa khi đơn ở trạng thái COMPLETED
-        if (!"COMPLETED".equals(session.getStatus())) {
+        // ✅ CHỈNH SỬA: Cho phép chỉnh sửa khi đơn ở COMPLETED hoặc REVIEW_REPORT
+        if (!"COMPLETED".equals(session.getStatus()) && !"REVIEW_REPORT".equals(session.getStatus())) {
             response.put("success", false);
-            response.put("message", "Chỉ có thể chỉnh sửa phản hồi khi đơn ở trạng thái 'Đã hoàn thành'");
+            response.put("message", "Chỉ có thể chỉnh sửa phản hồi khi đơn ở trạng thái 'Đã hoàn thành' hoặc 'Chờ duyệt'");
             return response;
         }
 
@@ -358,7 +318,7 @@ public class QuanLiDonThueService {
         quanLiDonThueRepository.save(session);
 
         Optional<CcdvProfile> profileOpt = Optional.ofNullable(
-                ccdvProfileRepository.findByUserId(session.getCcdv().getId()) // userId
+                ccdvProfileRepository.findByUserId(session.getCcdv().getId())
         );
         profileOpt.ifPresent(profile -> {
             if (profile.getHireCount() == null) {
