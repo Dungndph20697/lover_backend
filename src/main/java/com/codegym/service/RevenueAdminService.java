@@ -24,10 +24,11 @@ public class RevenueAdminService {
     public Double getTotalRevenueByCcdvId(Long ccdvId) {
         System.out.println(">>> Getting total revenue for CCDV ID: " + ccdvId);
 
-        // Tính tổng từ hire_sessions có status COMPLETED
         Double total = hireSessionRepository.findAll().stream()
                 .filter(h -> h.getCcdv() != null && h.getCcdv().getId().equals(ccdvId))
-                .filter(h -> "COMPLETED".equals(h.getStatus()))
+                .filter(h -> "COMPLETED".equals(h.getStatus()) ||
+                        "REPORTED".equals(h.getStatus()) ||
+                        "REVIEW_REPORT".equals(h.getStatus()))
                 .mapToDouble(h -> h.getTotalPrice() != null ? h.getTotalPrice() : 0)
                 .sum();
 
