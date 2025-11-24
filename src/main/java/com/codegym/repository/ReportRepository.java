@@ -7,11 +7,12 @@ import java.util.List;
 import java.util.Optional;
 
 public interface ReportRepository extends JpaRepository<Report, Long> {
-    Optional<Report> findByHireSessionId(Long hireSessionId);
+    // ✅ FIX: Trả về List thay vì Optional
+    List<Report> findByHireSessionId(Long hireSessionId);
 
-    List<Report> findAllByHireSessionId(Long hireSessionId);
-
-    void deleteByHireSessionId(Long hireSessionId);
-
+    // Lấy tất cả báo cáo của 1 CCDV với status cụ thể
     Long countByCcdvIdAndStatus(Long ccdvId, String status);
+
+    // Xóa tất cả báo cáo của 1 đơn thuê
+    void deleteByHireSessionId(Long hireSessionId);
 }

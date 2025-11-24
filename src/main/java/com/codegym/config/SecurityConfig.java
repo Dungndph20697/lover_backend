@@ -51,6 +51,7 @@ public class SecurityConfig {
                         .requestMatchers("/api/users/profiles/**").permitAll()
                         .requestMatchers("/api/users/service/**").permitAll()
                         .requestMatchers("/api/users/check-cccd/**").permitAll()
+                        .requestMatchers("/api/user/hire-sessions/**").permitAll()
 
                         // Test email endpoints
                         .requestMatchers("/api/ccdv/hire-sessions/test-email").permitAll()

@@ -4,9 +4,11 @@ import com.codegym.model.HireSession;
 import com.codegym.service.UserHireService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.HashMap;
 import java.util.Map;
 
 @RestController
@@ -16,14 +18,21 @@ public class UserHireController {
 
     private final UserHireService userHireService;
 
-    //    Lấy thống kê
+    // ✅ Lấy thống kê
     @GetMapping("/statistics/{userId}")
     public ResponseEntity<Map<String, Object>> getUserStatistics(@PathVariable Long userId) {
-        Map<String, Object> stats = userHireService.getUserStatistics(userId);
-        return ResponseEntity.ok(stats);
+        try {
+            Map<String, Object> stats = userHireService.getUserStatistics(userId);
+            return ResponseEntity.ok(stats);
+        } catch (Exception e) {
+            Map<String, Object> error = new HashMap<>();
+            error.put("success", false);
+            error.put("message", e.getMessage());
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(error);
+        }
     }
 
-    //    Lấy danh sách đơn đã thuê
+    // ✅ Lấy danh sách đơn đã thuê
     @GetMapping
     public ResponseEntity<Page<HireSession>> getUserHireSessions(
             @RequestParam Long userId,
@@ -31,67 +40,144 @@ public class UserHireController {
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "10") int size) {
 
-        Page<HireSession> sessions = userHireService.getUserHireSessions(userId, status, page, size);
-        return ResponseEntity.ok(sessions);
+        try {
+            Page<HireSession> sessions = userHireService.getUserHireSessions(userId, status, page, size);
+            return ResponseEntity.ok(sessions);
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
+        }
     }
 
-    //    Lấy chi tiết đơn thuê
+    // ✅ Lấy chi tiết đơn thuê
     @GetMapping("/{sessionId}")
-    public ResponseEntity<HireSession> getHireSessionById(@PathVariable Long sessionId) {
-        HireSession session = userHireService.getHireSessionById(sessionId);
-        return ResponseEntity.ok(session);
+    public ResponseEntity<?> getHireSessionById(@PathVariable Long sessionId) {
+        try {
+            HireSession session = userHireService.getHireSessionById(sessionId);
+            return ResponseEntity.ok(session);
+        } catch (Exception e) {
+            Map<String, Object> error = new HashMap<>();
+            error.put("success", false);
+            error.put("message", e.getMessage());
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(error);
+        }
     }
 
-    //    Hoàn thành đơn
+    // ✅ Hoàn thành đơn (ACCEPTED -> COMPLETED)
     @PatchMapping("/{sessionId}/complete")
-    public ResponseEntity<HireSession> completeHireSession(
+    public ResponseEntity<?> completeHireSession(
             @PathVariable Long sessionId,
             @RequestParam Long userId) {
 
-        HireSession session = userHireService.completeHireSession(sessionId, userId);
-        return ResponseEntity.ok(session);
+        try {
+            HireSession session = userHireService.completeHireSession(sessionId, userId);
+            Map<String, Object> response = new HashMap<>();
+            response.put("success", true);
+            response.put("message", "Đã hoàn thành đơn thuê");
+            response.put("data", session);
+            return ResponseEntity.ok(response);
+        } catch (Exception e) {
+            Map<String, Object> error = new HashMap<>();
+            error.put("success", false);
+            error.put("message", e.getMessage());
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(error);
+        }
     }
 
-    //    Cập nhật trạng thái
+    // ✅ Cập nhật trạng thái (không cần dùng, sử dụng các endpoint cụ thể thay)
     @PatchMapping("/{sessionId}/status")
-    public ResponseEntity<HireSession> updateStatus(
+    public ResponseEntity<?> updateStatus(
             @PathVariable Long sessionId,
             @RequestParam Long userId,
             @RequestParam String status) {
 
-        HireSession session = userHireService.updateHireSessionStatus(sessionId, userId, status);
-        return ResponseEntity.ok(session);
+        try {
+            HireSession session = userHireService.updateHireSessionStatus(sessionId, userId, status);
+            Map<String, Object> response = new HashMap<>();
+            response.put("success", true);
+            response.put("message", "Đã cập nhật trạng thái");
+            response.put("data", session);
+            return ResponseEntity.ok(response);
+        } catch (Exception e) {
+            Map<String, Object> error = new HashMap<>();
+            error.put("success", false);
+            error.put("message", e.getMessage());
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(error);
+        }
     }
 
-    //    Hủy đơn thuê
+    // ✅ Hủy đơn thuê (PENDING -> xóa)
     @DeleteMapping("/{sessionId}")
-    public ResponseEntity<Void> cancelHireSession(
+    public ResponseEntity<?> cancelHireSession(
             @PathVariable Long sessionId,
             @RequestParam Long userId) {
 
-        userHireService.cancelHireSession(sessionId, userId);
-        return ResponseEntity.noContent().build();
+        try {
+            userHireService.cancelHireSession(sessionId, userId);
+            Map<String, Object> response = new HashMap<>();
+            response.put("success", true);
+            response.put("message", "Đã hủy đơn thuê");
+            return ResponseEntity.ok(response);
+        } catch (Exception e) {
+            Map<String, Object> error = new HashMap<>();
+            error.put("success", false);
+            error.put("message", e.getMessage());
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(error);
+        }
     }
 
-    //   Thêm báo cáo
+    // ✅ Thêm báo cáo (COMPLETED -> REVIEW_REPORT)
     @PostMapping("/{sessionId}/report")
-    public ResponseEntity<HireSession> addUserReport(
+    public ResponseEntity<?> addUserReport(
             @PathVariable Long sessionId,
             @RequestParam Long userId,
             @RequestBody Map<String, String> request) {
 
-        String report = request.get("report");
-        if (report == null || report.trim().isEmpty()) {
-            throw new RuntimeException("Nội dung báo cáo không được để trống");
-        }
+        try {
+            String report = request.get("report");
 
-        HireSession session = userHireService.addUserReport(sessionId, userId, report);
-        return ResponseEntity.ok(session);
+            if (report == null || report.trim().isEmpty()) {
+                Map<String, Object> error = new HashMap<>();
+                error.put("success", false);
+                error.put("message", "Nội dung báo cáo không được để trống");
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(error);
+            }
+
+            HireSession session = userHireService.addUserReport(sessionId, userId, report);
+            Map<String, Object> response = new HashMap<>();
+            response.put("success", true);
+            response.put("message", "Báo cáo đã được gửi, chờ admin xem xét");
+            response.put("data", session);
+            return ResponseEntity.ok(response);
+        } catch (Exception e) {
+            Map<String, Object> error = new HashMap<>();
+            error.put("success", false);
+            error.put("message", e.getMessage());
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(error);
+        }
     }
 
-    //    Exception Handler
+    // ✅ Global Exception Handler
     @ExceptionHandler(RuntimeException.class)
-    public ResponseEntity<String> handleException(RuntimeException e) {
-        return ResponseEntity.badRequest().body(e.getMessage());
+    public ResponseEntity<Map<String, Object>> handleRuntimeException(RuntimeException e) {
+        Map<String, Object> error = new HashMap<>();
+        error.put("success", false);
+        error.put("message", e.getMessage());
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(error);
+    }
+
+    @ExceptionHandler(IllegalArgumentException.class)
+    public ResponseEntity<Map<String, Object>> handleIllegalArgumentException(IllegalArgumentException e) {
+        Map<String, Object> error = new HashMap<>();
+        error.put("success", false);
+        error.put("message", e.getMessage());
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(error);
+    }
+
+    @ExceptionHandler(Exception.class)
+    public ResponseEntity<Map<String, Object>> handleException(Exception e) {
+        Map<String, Object> error = new HashMap<>();
+        error.put("success", false);
+        error.put("message", "Có lỗi xảy ra: " + e.getMessage());
+        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(error);
     }
 }
