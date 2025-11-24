@@ -50,10 +50,25 @@ public class UserController {
         String username = request.get("username");
         String password = request.get("password");
 
+        // Kiểm tra username có tồn tại không
+        User user = userService.findUserByUsername(username)
+                .orElseThrow(() -> new RuntimeException("Sai username hoặc password"));
+
+        // Kiểm tra đã được Admin duyệt chưa
+        if (user.getIsActive() == null || !user.getIsActive()) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN)
+                    .body(Map.of(
+                            "success", false,
+                            "message", "Tài khoản chưa được Admin duyệt"
+                    ));
+        }
+
+        // 3️⃣ Xác thực mật khẩu
         authenticationManager.authenticate(
                 new UsernamePasswordAuthenticationToken(username, password)
         );
 
+        // 4️⃣ Tạo JWT token
         UserDetails userDetails = userDetailsService.loadUserByUsername(username);
         String token = jwtService.generateToken(username);
 

@@ -59,6 +59,10 @@ public class SecurityConfig {
                         .requestMatchers("/api/ccdv/hire-sessions/**").permitAll()
                         .requestMatchers("/ws/**").permitAll()
                         .requestMatchers("/api/messages/**").permitAll()
+                        .requestMatchers("/api/admin/hire-sessions/**").hasRole("ADMIN")
+                        .requestMatchers(HttpMethod.GET, "/api/admin/revenues").hasRole("ADMIN")
+                        .requestMatchers(HttpMethod.GET, "/api/admin/revenues/**").hasRole("ADMIN")
+                        .requestMatchers(HttpMethod.GET, "/api/admin/revenues/stats").hasRole("ADMIN")
 
                         .requestMatchers("/api/sepay/webhook").permitAll()
 
@@ -69,7 +73,7 @@ public class SecurityConfig {
                         .requestMatchers("/api/ccdv-profiles/user/**").hasRole("SERVICE_PROVIDER")
                         .requestMatchers("/api/ccdv-profiles/update/**").hasRole("SERVICE_PROVIDER")
                         .requestMatchers("/api/ccdv-profiles/toggle-status/**").hasRole("SERVICE_PROVIDER")
-                        .requestMatchers("/api/wallet/topup").hasAnyRole("U?????????????????????SERVICE_PROVIDER")
+                        .requestMatchers("/api/wallet/topup").hasAnyRole("USER", "SERVICE_PROVIDER")
                         .requestMatchers("/api/hire/create").hasRole("USER")
 
                         .requestMatchers("/api/revenue/**").permitAll()
@@ -93,6 +97,10 @@ public class SecurityConfig {
 
                         .requestMatchers("/api/ccdv/**").hasRole("SERVICE_PROVIDER")
                         .requestMatchers("/api/hire/create").hasRole("USER")
+
+                        // admin
+                        .requestMatchers("/api/admin/**").hasRole("ADMIN")
+
 
 
                         .anyRequest().authenticated()
