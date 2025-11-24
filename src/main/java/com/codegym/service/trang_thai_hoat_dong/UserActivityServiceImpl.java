@@ -15,7 +15,7 @@ public class UserActivityServiceImpl implements UserActivityService {
 
     private final UserRepository userRepository;
 
-    // User online nếu hoạt động trong 5 phút
+    // Thời gian tính online (5 phút)
     private static final int ONLINE_MINUTES = 5;
 
     @Override
@@ -25,12 +25,13 @@ public class UserActivityServiceImpl implements UserActivityService {
 
         Map<String, Object> response = new HashMap<>();
 
-        String status = getStatusFromActivity(user.getLastActivity());
+        String status = calculateStatus(user.getLastActivity());
 
         response.put("userId", user.getId());
         response.put("fullName", user.getFirstName() + " " + user.getLastName());
         response.put("status", status);
         response.put("lastActivity", user.getLastActivity());
+        response.put("lastSeenText", formatLastSeen(user.getLastActivity()));  // ⭐ thêm vào
 
         return response;
     }
@@ -52,6 +53,7 @@ public class UserActivityServiceImpl implements UserActivityService {
                 info.put("userId", u.getId());
                 info.put("fullName", u.getFirstName() + " " + u.getLastName());
                 info.put("lastActivity", u.getLastActivity());
+                info.put("lastSeenText", formatLastSeen(u.getLastActivity())); // ⭐ thêm
                 onlineList.add(info);
             }
         }
@@ -82,8 +84,12 @@ public class UserActivityServiceImpl implements UserActivityService {
         return summary;
     }
 
-    // 👉 Helper method: xác định trạng thái từ thời gian hoạt động
-    private String getStatusFromActivity(LocalDateTime lastActivity) {
+    // ================================================================
+    // ⭐ ⭐ ⭐   HELPER METHODS   ⭐ ⭐ ⭐
+    // ================================================================
+
+    // Xác định trạng thái từ lastActivity
+    private String calculateStatus(LocalDateTime lastActivity) {
         if (lastActivity == null) return "Không hoạt động";
 
         long diff = Duration.between(lastActivity, LocalDateTime.now()).toMinutes();
@@ -91,7 +97,24 @@ public class UserActivityServiceImpl implements UserActivityService {
         if (diff <= ONLINE_MINUTES) {
             return "Đang hoạt động";
         } else {
-            return "Không hoạt động";
+            return "Hoạt động " + formatLastSeen(lastActivity);
         }
+    }
+
+    // Format thời gian như Facebook / Zalo
+    private String formatLastSeen(LocalDateTime lastActivity) {
+        if (lastActivity == null) return "Chưa hoạt động";
+
+        LocalDateTime now = LocalDateTime.now();
+        long minutes = Duration.between(lastActivity, now).toMinutes();
+        long hours = minutes / 60;
+        long days = hours / 24;
+
+        if (minutes < 1) return "vừa xong";
+        if (minutes < 60) return minutes + " phút trước";
+        if (hours < 24) return hours + " giờ trước";
+        if (days == 1) return "hôm qua";
+
+        return days + " ngày trước";
     }
 }
