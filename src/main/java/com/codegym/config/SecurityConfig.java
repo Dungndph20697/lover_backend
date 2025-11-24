@@ -74,8 +74,7 @@ public class SecurityConfig {
                         .requestMatchers("/api/ccdv-profiles/toggle-status/**").hasRole("SERVICE_PROVIDER")
                         .requestMatchers("/api/wallet/topup").hasAnyRole("U?????????????????????SERVICE_PROVIDER")
                         .requestMatchers("/api/hire/create").hasRole("USER")
-
-
+                        .requestMatchers("/api/admin/**").hasRole("ADMIN")
                         .anyRequest().authenticated()
                 )
                 .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class);

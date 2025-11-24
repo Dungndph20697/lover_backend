@@ -50,6 +50,13 @@ public class UserController {
         String username = request.get("username");
         String password = request.get("password");
 
+        User user = userService.findUserByUsername(username).get();
+        if (!"ACTIVE".equalsIgnoreCase(user.getStatus())) {
+            System.out.println("aaaaaaaaaaaaaaa"+user.getStatus());
+            return ResponseEntity.status(HttpStatus.FORBIDDEN)
+                    .body(Map.of("success", false, "message", "Tài khoản đã bị khóa, vui lòng liên hệ Admin!"));
+        }
+
         authenticationManager.authenticate(
                 new UsernamePasswordAuthenticationToken(username, password)
         );
