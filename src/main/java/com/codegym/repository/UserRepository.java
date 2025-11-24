@@ -1,8 +1,13 @@
 package com.codegym.repository;
 
 import com.codegym.dto.TopCcdvDTO;
+import com.codegym.dto.UserListDTO;
 import com.codegym.model.User;
+
+import jakarta.transaction.Transactional;
+
 import org.springframework.data.domain.Page;
+
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
@@ -37,6 +42,25 @@ public interface UserRepository extends JpaRepository<User, Long> {
             "ORDER BY u.viewCount DESC")
     List<TopCcdvDTO> findTopCcdvWithProfile(@Param("roleId") Long roleId, Pageable pageable);
 
+
+
+    // Lấy danh sách user TRỪ ADMIN
+    @Query("SELECT new com.codegym.dto.UserListDTO(u.id, CONCAT(u.firstName, ' ', u.lastName), u.nickname, u.role.name,u.status) " +
+            "FROM User u WHERE u.role.name <> 'ADMIN'")
+    List<UserListDTO> getAllUsersExceptAdmin();
+
+    // Lọc theo role
+    @Query("SELECT new com.codegym.dto.UserListDTO(u.id, CONCAT(u.firstName, ' ', u.lastName), u.nickname, u.role.name,u.status) " +
+            "FROM User u WHERE u.role.name = :roleName")
+    List<UserListDTO> findByRole(@Param("roleName") String roleName);
+
+    boolean existsById(Long id);
+
+    @Transactional
+    @Modifying
+    @Query("UPDATE User u SET u.status = :status WHERE u.id = :userId")
+    void updateStatus(@Param("userId") Long userId, @Param("status") String status);
+
     // lấy danh sách tài khoản có phân trang
     Page<User> findAll(Pageable pageable);
 
@@ -45,5 +69,6 @@ public interface UserRepository extends JpaRepository<User, Long> {
 
     // lấy danh sách ccdv vip (id = 2)
     Page<User> findByRole_IdAndIsVipTrue(Long roleId, Pageable pageable);
+
 
 }
