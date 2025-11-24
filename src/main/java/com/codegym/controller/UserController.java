@@ -49,12 +49,21 @@ public class UserController {
         String username = request.get("username");
         String password = request.get("password");
 
+
+        User user = userService.findUserByUsername(username).get();
+        if (!"ACTIVE".equalsIgnoreCase(user.getStatus())) {
+            System.out.println("aaaaaaaaaaaaaaa"+user.getStatus());
+            return ResponseEntity.status(HttpStatus.FORBIDDEN)
+                    .body(Map.of("success", false, "message", "Tài khoản đã bị khóa, vui lòng liên hệ Admin!"));
+        }
+
+
         // Kiểm tra username có tồn tại không
-        User user = userService.findUserByUsername(username)
+        User user1 = userService.findUserByUsername(username)
                 .orElseThrow(() -> new RuntimeException("Sai username hoặc password"));
 
         // Kiểm tra đã được Admin duyệt chưa
-        if (user.getIsActive() == null || !user.getIsActive()) {
+        if (user1.getIsActive() == null || !user.getIsActive()) {
             return ResponseEntity.status(HttpStatus.FORBIDDEN)
                     .body(Map.of(
                             "success", false,

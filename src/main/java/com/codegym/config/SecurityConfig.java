@@ -98,15 +98,12 @@ public class SecurityConfig {
                         .requestMatchers("/api/ccdv/**").hasRole("SERVICE_PROVIDER")
                         .requestMatchers("/api/hire/create").hasRole("USER")
 
-                        // admin
                         .requestMatchers("/api/admin/**").hasRole("ADMIN")
                         .requestMatchers("/api/user-activity/admin/**").hasRole("ADMIN")
 
                         // User xem trạng thái hoạt động của người khác
                         .requestMatchers("/api/user-activity/status/**")
                         .hasAnyRole("USER", "SERVICE_PROVIDER", "ADMIN")
-
-
 
 
                         .anyRequest().authenticated()
