@@ -1,6 +1,7 @@
 package com.codegym.repository;
 
 import com.codegym.dto.TopCcdvDTO;
+import com.codegym.dto.TopViewLoverDTO;
 import com.codegym.model.User;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -17,9 +18,10 @@ public interface TopLoverRepository extends JpaRepository<User, Long> {
     @Query("UPDATE User u SET u.viewCount = u.viewCount + 1 WHERE u.id = :id")
     void increaseView(@Param("id") Long id);
 
-    @Query("SELECT new com.codegym.dto.TopCcdvDTO(u.id, p.fullName, p.avatar, p.description, u.viewCount) " +
+    @Query("SELECT new com.codegym.dto.TopViewLoverDTO(u.id, p.fullName, p.avatar, p.description, u.viewCount, p.status) " +
             "FROM User u JOIN CcdvProfile p ON u.id = p.user.id " +
             "WHERE u.role.id = :roleId " +
+            " AND p.status = 'ACTIVE' " +
             "ORDER BY u.viewCount DESC")
-    List<TopCcdvDTO> findTopCcdvWithProfile(@Param("roleId") Long roleId, Pageable pageable);
+    List<TopViewLoverDTO> findTopCcdvWithProfile(@Param("roleId") Long roleId, Pageable pageable);
 }
