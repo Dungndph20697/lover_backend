@@ -18,7 +18,7 @@ public class CcdvProfileController {
     private CcdvProfileService ccdvProfileService;
 
     @GetMapping("/{id}")
-    public ResponseEntity<?> getProfileDetail(@PathVariable Long id) {
+    public ResponseEntity<?> getProfileDetail(@PathVariable("id") Long id) {
         return ResponseEntity.ok(ccdvProfileService.findByUserId(id));
     }
 }
