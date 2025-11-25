@@ -1,6 +1,7 @@
 package com.codegym.repository;
 
 import com.codegym.model.CcdvProfile;
+import com.codegym.model.CcdvServiceDetail;
 import com.codegym.model.enums.ProfileStatus;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -27,13 +28,14 @@ public interface RecommendationRepository extends JpaRepository<CcdvProfile, Lon
 
     // Lấy 3 service random theo userId
     @Query(value = """
-        SELECT s.name 
-        FROM service_types s 
-        WHERE s.ccdv_id = :userId 
-        ORDER BY RAND() 
+        SELECT st.name
+        FROM service_types st
+        JOIN ccdv_service_detail d ON d.service_type_id = st.id
+        WHERE d.user_id = :profileId
+        ORDER BY RAND()
         LIMIT 3
     """, nativeQuery = true)
-    List<String> findRandomServicesByUserId(Long userId);
+    List<String> findRandomServicesByUserId(Long profileId);
 
     @Query("""
         SELECT p FROM CcdvProfile p
@@ -59,4 +61,9 @@ public interface RecommendationRepository extends JpaRepository<CcdvProfile, Lon
         ORDER BY p.joinDate DESC
     """)
     List<CcdvProfile> findByGenderAndStatus(@Param("gender") String gender, Pageable pageable);
+
+    @Query("""
+        SELECT d FROM CcdvServiceDetail d WHERE d.user.id = :userId
+    """)
+    List<CcdvServiceDetail> findServicesByUserId(Long userId);
 }

@@ -1,17 +1,17 @@
 package com.codegym.service;
 
-import com.codegym.dto.CcdvFilterRequest;
-import com.codegym.dto.CcdvSuggestGenderDTO;
+import com.codegym.dto.CcdvFindByCity;
+import com.codegym.dto.CcdvFindByCity;
+import com.codegym.dto.ServiceTypeDTO;
 import com.codegym.dto.ServiceVipDTO;
 import com.codegym.model.CcdvProfile;
 import com.codegym.model.CcdvServiceDetail;
 import com.codegym.model.ServiceType;
 import com.codegym.model.enums.ProfileStatus;
-import com.codegym.repository.CcdvServiceDetailRepository;
-import com.codegym.repository.RecommendationRepository;
+import com.codegym.repository.CcdvFindByCityRepository;
+import com.codegym.repository.ServiceTypeFindByCityRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
@@ -19,45 +19,49 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
-public class RecommendationService {
+public class CcdvFindByCityService {
     @Autowired
-    private RecommendationRepository repository;
+    private CcdvFindByCityRepository ccdvRepository;
 
     @Autowired
-    private CcdvServiceDetailRepository serviceDetailRepo;
+    private ServiceTypeFindByCityRepository serviceTypeRepository;
 
-    public List<CcdvSuggestGenderDTO> suggestProviders(String gender) {
+    private final Random random = new Random();
+
+    //find all
+    public List<CcdvFindByCity> getAllActiveCcdv(String city) {
+        List<CcdvProfile> profiles;
+        List<CcdvFindByCity> result = new ArrayList<>();
         int LIMIT = 12;
 
-        List<CcdvProfile> profiles;
-
-        if (gender != null && !gender.isBlank()) {
-            profiles = repository.findByGenderAndStatusOrderByJoinDateDesc(
-                    gender, ProfileStatus.ACTIVE, PageRequest.of(0, LIMIT)
+        //city ko đc null
+        if (city != null && !city.isBlank()) {
+            profiles = ccdvRepository.findTop12ByCityAndStatusOrderByJoinDateDesc(
+                    city,
+                    ProfileStatus.ACTIVE,
+                    PageRequest.of(0, LIMIT)
             );
         } else {
-            profiles = repository.findByStatusOrderByJoinDateDesc(
-                    ProfileStatus.ACTIVE, PageRequest.of(0, LIMIT)
+            profiles = ccdvRepository.findTop12ByStatusOrderByJoinDateDesc(
+                    ProfileStatus.ACTIVE,
+                    PageRequest.of(0, LIMIT)
             );
         }
-
-        List<CcdvSuggestGenderDTO> result = new ArrayList<>();
 
         for (CcdvProfile p : profiles) {
 
             Long userId = p.getUser().getId();
+            List<CcdvServiceDetail> services = serviceTypeRepository.findByUser(userId);
 
-            List<CcdvServiceDetail> services = serviceDetailRepo.findByUser_Id(userId);
-
-            // random 3 services
-            Collections.shuffle(services);
+            // Random 3
+            Collections.shuffle(services, new Random(System.currentTimeMillis()));
             List<CcdvServiceDetail> picked = services.stream()
                     .limit(3)
                     .collect(Collectors.toList());
 
-            // convert DTO
+            // Convert DTO
             List<ServiceVipDTO> serviceDtos = picked.stream()
-                    .filter(s -> s.getServiceType() != null && s.getServiceType().getPricePerHour() != null)
+                    .filter(s -> s.getServiceType() != null)
                     .map(s -> new ServiceVipDTO(
                             s.getServiceType().getId(),
                             s.getServiceType().getName(),
@@ -65,7 +69,7 @@ public class RecommendationService {
                     ))
                     .collect(Collectors.toList());
 
-            // min price
+            // Giá thấp nhất
             Optional<BigDecimal> minPrice = services.stream()
                     .map(CcdvServiceDetail::getServiceType)
                     .filter(Objects::nonNull)
@@ -74,23 +78,21 @@ public class RecommendationService {
                     .filter(price -> price.compareTo(BigDecimal.ZERO) > 0)
                     .min(BigDecimal::compareTo);
 
-            // total price (sum 3)
+            // Tổng 3 giá
             BigDecimal totalPrice = picked.stream()
-                    .map(CcdvServiceDetail::getServiceType)
-                    .filter(Objects::nonNull)
-                    .map(ServiceType::getPricePerHour)
+                    .map(s -> s.getServiceType().getPricePerHour())
                     .filter(Objects::nonNull)
                     .filter(price -> price.compareTo(BigDecimal.ZERO) > 0)
                     .reduce(BigDecimal.ZERO, BigDecimal::add);
 
-
-            CcdvSuggestGenderDTO dto = new CcdvSuggestGenderDTO();
+            // Build DTO
+            CcdvFindByCity dto = new CcdvFindByCity();
             dto.setProfileId(p.getId());
             dto.setUserId(userId);
             dto.setName(p.getFullName());
             dto.setAvatar(p.getAvatar());
             dto.setDescription(p.getDescription());
-            dto.setGender(p.getGender());
+            dto.setCity(p.getCity());
             dto.setServices(serviceDtos);
             dto.setStartingPricePerHour(minPrice.orElse(null));
             dto.setTotalPrice(totalPrice);
@@ -100,16 +102,5 @@ public class RecommendationService {
         }
 
         return result;
-    }
-
-    public List<CcdvProfile> filterProfiles(CcdvFilterRequest request) {
-
-        String name = request.getName();
-        Integer minAge = request.getMinAge();
-        Integer maxAge = request.getMaxAge();
-        String gender = request.getGender();
-        String address = request.getAddress();
-
-        return repository.filterProfiles(name, minAge, maxAge, gender, address);
     }
 }

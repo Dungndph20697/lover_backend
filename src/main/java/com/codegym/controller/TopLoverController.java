@@ -1,6 +1,7 @@
 package com.codegym.controller;
 
 import com.codegym.dto.TopCcdvDTO;
+import com.codegym.dto.TopViewLoverDTO;
 import com.codegym.model.User;
 import com.codegym.service.TopLoverService;
 import lombok.RequiredArgsConstructor;
@@ -31,8 +32,8 @@ public class TopLoverController {
     }
 
     @GetMapping("/top-ccdv-view")
-    public ResponseEntity<List<TopCcdvDTO>> getTopCcdvByView() {
-        List<TopCcdvDTO> top6 = service.getTop6CcdvByView();
+    public ResponseEntity<List<TopViewLoverDTO>> getTopCcdvByView() {
+        List<TopViewLoverDTO> top6 = service.getTop6CcdvByView();
         return ResponseEntity.ok(top6);
     }
 }

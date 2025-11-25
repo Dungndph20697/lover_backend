@@ -1,6 +1,8 @@
 package com.codegym.controller;
 
 import com.codegym.dto.CcdvFilterRequest;
+import com.codegym.dto.CcdvSuggestGenderDTO;
+import com.codegym.dto.CcdvSuggestionDTO;
 import com.codegym.model.CcdvProfile;
 import com.codegym.service.RecommendationService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -16,9 +18,9 @@ public class RecommendationController {
     private RecommendationService recommendationService;
 
     @GetMapping("/providers")
-    public ResponseEntity<List<CcdvProfile>> getProviders() {
-        List<CcdvProfile> data = recommendationService.getAllActiveProviders();
-        return ResponseEntity.ok(data);
+    public ResponseEntity<List<CcdvSuggestGenderDTO>> getProviders(@RequestParam(required = false) String gender) {
+        return ResponseEntity.ok(recommendationService.suggestProviders(gender));
+
     }
 
     @PostMapping("/filter")
