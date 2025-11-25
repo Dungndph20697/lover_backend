@@ -77,7 +77,7 @@ public class SecurityConfig {
                         .requestMatchers("/api/wallet/topup").hasAnyRole("USER", "SERVICE_PROVIDER")
                         .requestMatchers("/api/hire/create").hasRole("USER")
 
-                        .requestMatchers("/api/revenue/**").permitAll()
+                        .requestMatchers("/api/revenue/**").authenticated()
                         .requestMatchers("/api/toplover/top-ccdv-view").permitAll()
                         .requestMatchers("/api/home/top-ccdv").permitAll()
 
