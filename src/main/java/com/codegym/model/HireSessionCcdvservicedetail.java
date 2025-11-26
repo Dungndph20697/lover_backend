@@ -1,5 +1,6 @@
 package com.codegym.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -26,6 +27,6 @@ public class HireSessionCcdvservicedetail {
 
     @ManyToOne
     @JoinColumn(name = "hireSession_id", nullable = false)
+    @JsonIgnore
     private HireSession hireSession;
-
 }

@@ -98,28 +98,28 @@ public class UserHireService {
     }
 
     // ✅ Thêm báo cáo - FIX logic
-    @Transactional
-    public HireSession addUserReport(Long sessionId, Long userId, String report) {
-        HireSession session = userHireRepository.findById(sessionId)
-                .orElseThrow(() -> new RuntimeException("Không tìm thấy đơn thuê"));
-
-        // Kiểm tra quyền
-        if (!session.getUser().getId().equals(userId)) {
-            throw new RuntimeException("Bạn không có quyền thực hiện hành động này");
-        }
-
-        // ✅ FIX: Chỉ cho phép báo cáo khi COMPLETED (chưa gửi báo cáo)
-        // Không được phép sửa báo cáo khi đã gửi (REVIEW_REPORT hoặc REPORTED)
-        if (!"COMPLETED".equals(session.getStatus())) {
-            throw new RuntimeException("Chỉ có thể báo cáo với đơn ở trạng thái 'Đã hoàn thành'");
-        }
-
-        session.setUserReport(report);
-        session.setStatus("REVIEW_REPORT");  // ✅ Chuyển sang chờ duyệt
-        session.setUpdatedAt(LocalDateTime.now());
-
-        return userHireRepository.save(session);
-    }
+//    @Transactional
+//    public HireSession addUserReport(Long sessionId, Long userId, String report) {
+//        HireSession session = userHireRepository.findById(sessionId)
+//                .orElseThrow(() -> new RuntimeException("Không tìm thấy đơn thuê"));
+//
+//        // Kiểm tra quyền
+//        if (!session.getUser().getId().equals(userId)) {
+//            throw new RuntimeException("Bạn không có quyền thực hiện hành động này");
+//        }
+//
+//        // ✅ FIX: Chỉ cho phép báo cáo khi COMPLETED (chưa gửi báo cáo)
+//        // Không được phép sửa báo cáo khi đã gửi (REVIEW_REPORT hoặc REPORTED)
+//        if (!"COMPLETED".equals(session.getStatus())) {
+//            throw new RuntimeException("Chỉ có thể báo cáo với đơn ở trạng thái 'Đã hoàn thành'");
+//        }
+//
+//        session.setUserReport(report);
+//        session.setStatus("REVIEW_REPORT");  // ✅ Chuyển sang chờ duyệt
+//        session.setUpdatedAt(LocalDateTime.now());
+//
+//        return userHireRepository.save(session);
+//    }
 
     // ✅ Lấy thống kê đơn thuê của user - FIX
     public Map<String, Object> getUserStatistics(Long userId) {
