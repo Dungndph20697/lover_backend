@@ -49,41 +49,56 @@ public class UserController {
         String username = request.get("username");
         String password = request.get("password");
 
+        // 1️⃣ Kiểm tra user có tồn tại không
+        User user = userService.findUserByUsername(username)
+                .orElse(null);
 
-        User user = userService.findUserByUsername(username).get();
-        if (!"ACTIVE".equalsIgnoreCase(user.getStatus())) {
-            System.out.println("aaaaaaaaaaaaaaa"+user.getStatus());
-            return ResponseEntity.status(HttpStatus.FORBIDDEN)
-                    .body(Map.of("success", false, "message", "Tài khoản đã bị khóa, vui lòng liên hệ Admin!"));
-        }
-
-
-        // Kiểm tra username có tồn tại không
-        User user1 = userService.findUserByUsername(username)
-                .orElseThrow(() -> new RuntimeException("Sai username hoặc password"));
-
-        // Kiểm tra đã được Admin duyệt chưa
-        if (user1.getIsActive() == null || !user.getIsActive()) {
-            return ResponseEntity.status(HttpStatus.FORBIDDEN)
+        if (user == null) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
                     .body(Map.of(
                             "success", false,
-                            "message", "Tài khoản chưa được Admin duyệt"
+                            "message", "Sai username hoặc password!"
                     ));
         }
 
-        // 3️⃣ Xác thực mật khẩu
-        authenticationManager.authenticate(
-                new UsernamePasswordAuthenticationToken(username, password)
-        );
+        // 2️⃣ Kiểm tra password đúng không
+        try {
+            authenticationManager.authenticate(
+                    new UsernamePasswordAuthenticationToken(username, password)
+            );
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                    .body(Map.of(
+                            "success", false,
+                            "message", "Sai username hoặc password!"
+                    ));
+        }
 
-        // 4️⃣ Tạo JWT token
-        UserDetails userDetails = userDetailsService.loadUserByUsername(username);
+        // 3️⃣ Kiểm tra tài khoản có bị khóa không
+        if (!"ACTIVE".equalsIgnoreCase(user.getStatus())) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN)
+                    .body(Map.of(
+                            "success", false,
+                            "message", "Tài khoản đã bị khóa!"
+                    ));
+        }
+
+        // 4️⃣ Kiểm tra Admin duyệt chưa
+        if (user.getIsActive() == null || !user.getIsActive()) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN)
+                    .body(Map.of(
+                            "success", false,
+                            "message", "Tài khoản chưa được Admin duyệt!"
+                    ));
+        }
+
+        // 5️⃣ Tạo token
         String token = jwtService.generateToken(username);
 
         return ResponseEntity.ok(Map.of(
                 "success", true,
                 "token", token,
-                "username", username
+                "user", user
         ));
     }
 
