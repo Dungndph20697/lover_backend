@@ -70,7 +70,7 @@ public class CcdvSuggestionServiceImpl implements CcdvSuggestionService {
                     .filter(price -> price.compareTo(BigDecimal.ZERO) > 0)
                     .reduce(BigDecimal.ZERO, BigDecimal::add);
 
-            System.out.println(">>> PROFILE: " + p.getId() + " | " + p.getFullName() + " | totalPrice=" + totalPrice);
+//            System.out.println(">>> PROFILE: " + p.getId() + " | " + p.getFullName() + " | totalPrice=" + totalPrice);
 
             CcdvSuggestionDTO dto = new CcdvSuggestionDTO();
             dto.setProfileId(p.getId());
