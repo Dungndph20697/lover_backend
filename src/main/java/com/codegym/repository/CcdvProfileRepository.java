@@ -22,7 +22,7 @@ public interface CcdvProfileRepository extends JpaRepository<CcdvProfile, Long>,
     CcdvProfile findByUserId(Long userId);
 
 
-    @Query("SELECT c FROM CcdvProfile c WHERE c.gender = :gender ORDER BY c.hireCount DESC")
+    @Query("SELECT c FROM CcdvProfile c WHERE c.gender = :gender and c.status='ACTIVE' ORDER BY c.hireCount DESC")
     List<CcdvProfile> findTopByGenderOrderByHireCountDesc(@Param("gender") String gender);
 
     // lấy danh sách profile dang hoat dong

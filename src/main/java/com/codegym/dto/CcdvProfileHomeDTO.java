@@ -13,6 +13,7 @@ import java.util.List;
 @AllArgsConstructor
 public class CcdvProfileHomeDTO {
     private Long id;
+    private Long userId;
     private String fullName;
     private String avatar;
     private String description;
