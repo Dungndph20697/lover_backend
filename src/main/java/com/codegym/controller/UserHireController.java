@@ -126,35 +126,35 @@ public class UserHireController {
     }
 
     // ✅ Thêm báo cáo (COMPLETED -> REVIEW_REPORT)
-    @PostMapping("/{sessionId}/report")
-    public ResponseEntity<?> addUserReport(
-            @PathVariable Long sessionId,
-            @RequestParam Long userId,
-            @RequestBody Map<String, String> request) {
-
-        try {
-            String report = request.get("report");
-
-            if (report == null || report.trim().isEmpty()) {
-                Map<String, Object> error = new HashMap<>();
-                error.put("success", false);
-                error.put("message", "Nội dung báo cáo không được để trống");
-                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(error);
-            }
-
-            HireSession session = userHireService.addUserReport(sessionId, userId, report);
-            Map<String, Object> response = new HashMap<>();
-            response.put("success", true);
-            response.put("message", "Báo cáo đã được gửi, chờ admin xem xét");
-            response.put("data", session);
-            return ResponseEntity.ok(response);
-        } catch (Exception e) {
-            Map<String, Object> error = new HashMap<>();
-            error.put("success", false);
-            error.put("message", e.getMessage());
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(error);
-        }
-    }
+//    @PostMapping("/{sessionId}/report")
+//    public ResponseEntity<?> addUserReport(
+//            @PathVariable Long sessionId,
+//            @RequestParam Long userId,
+//            @RequestBody Map<String, String> request) {
+//
+//        try {
+//            String report = request.get("report");
+//
+//            if (report == null || report.trim().isEmpty()) {
+//                Map<String, Object> error = new HashMap<>();
+//                error.put("success", false);
+//                error.put("message", "Nội dung báo cáo không được để trống");
+//                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(error);
+//            }
+//
+//            HireSession session = userHireService.addUserReport(sessionId, userId, report);
+//            Map<String, Object> response = new HashMap<>();
+//            response.put("success", true);
+//            response.put("message", "Báo cáo đã được gửi, chờ admin xem xét");
+//            response.put("data", session);
+//            return ResponseEntity.ok(response);
+//        } catch (Exception e) {
+//            Map<String, Object> error = new HashMap<>();
+//            error.put("success", false);
+//            error.put("message", e.getMessage());
+//            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(error);
+//        }
+//    }
 
     // ✅ Global Exception Handler
     @ExceptionHandler(RuntimeException.class)

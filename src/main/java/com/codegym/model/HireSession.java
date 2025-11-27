@@ -2,6 +2,9 @@ package com.codegym.model;
 
 import jakarta.persistence.*;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
+
 import lombok.*;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
@@ -46,10 +49,21 @@ public class HireSession {
     @Column(name = "address")
     private String address; // Địa chỉ nơi cung cấp dịch vụ
 
+    @OneToMany(
+            mappedBy = "hireSession",
+            cascade = CascadeType.ALL,
+            orphanRemoval = true
+    )
+    private List<HireSessionCcdvservicedetail> serviceDetails = new ArrayList<>();
+
+
     @Column(name = "user_report")
     private String userReport; // Báo cáo từ người thuê về buổi thuê
 
     @UpdateTimestamp
     @Column(name = "updated_at")
     private LocalDateTime updatedAt; // Thời gian cập nhật cuối cùng
+
+    // xoá đơn
+
 }
