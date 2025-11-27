@@ -38,7 +38,7 @@ public class TopTrangChuService {
 
     // Chuyển sang DTO
     public CcdvProfileHomeDTO toDTO(CcdvProfile ccdv) {
-        System.out.println(">>> PROFILE: " + ccdv.getId() + " | " + ccdv.getFullName() + " | hireCount=" + ccdv.getHireCount());
+        System.out.println(">>> PROFILE_ID: " + ccdv.getId() + " | " + ccdv.getFullName() + " | hireCount=" + ccdv.getHireCount() + " | userId=" + ccdv.getUser().getId());
         return new CcdvProfileHomeDTO(
                 ccdv.getId(),
                 ccdv.getUser().getId(),
