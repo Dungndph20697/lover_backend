@@ -41,6 +41,7 @@ public class TopTrangChuService {
         System.out.println(">>> PROFILE: " + ccdv.getId() + " | " + ccdv.getFullName() + " | hireCount=" + ccdv.getHireCount());
         return new CcdvProfileHomeDTO(
                 ccdv.getId(),
+                ccdv.getUser().getId(),
                 ccdv.getFullName(),
                 ccdv.getAvatar(),
                 ccdv.getDescription(),

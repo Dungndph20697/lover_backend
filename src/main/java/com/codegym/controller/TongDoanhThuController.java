@@ -3,6 +3,7 @@ package com.codegym.controller;
 import com.codegym.dto.RevenueRangeRequestDTO;
 import com.codegym.dto.RevenueResponseDTO;
 import com.codegym.service.tongdoanhthu.RevenueService;
+import com.codegym.service.tongdoanhthu.RevenueServiceImpl;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 
@@ -19,9 +20,10 @@ import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/api/revenue")
+//STATUS: COMPLETED thì mới nhận đc dữ liệu
 public class TongDoanhThuController {
     @Autowired
-    private RevenueService revenueService;
+    private RevenueServiceImpl revenueService;
 
     @GetMapping("/today")
     public RevenueResponseDTO revenueToday(Principal principal) {
@@ -37,6 +39,7 @@ public class TongDoanhThuController {
         LocalDateTime start = ym.atDay(1).atStartOfDay();
         LocalDateTime end = ym.atEndOfMonth().atTime(23, 59, 59);
         Double revenue = revenueService.revenueThisMonth(principal.getName());
+        System.out.println(revenue);
         return new RevenueResponseDTO(revenue, "VND",
                 start.toLocalDate().toString(), end.toLocalDate().toString());
     }
