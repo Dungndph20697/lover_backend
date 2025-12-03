@@ -1,11 +1,18 @@
 package com.codegym.controller;
 
+import com.codegym.dto.TopCcdvDTO;
+
+import com.codegym.model.CcdvServiceDetail;
+
+import com.codegym.model.CcdvServiceDetail;
 import com.codegym.model.User;
 import com.codegym.service.JwtService;
 import com.codegym.service.UserService;
+import com.codegym.service.impl.CcdvServiceDetailService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -14,13 +21,16 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
 import java.util.Map;
 
-@CrossOrigin(origins = "http://localhost:5173")
 @RestController
 @RequestMapping("/api/users")
 @RequiredArgsConstructor
 public class UserController {
+
+    @Autowired
+    private CcdvServiceDetailService serviceDetailService;
 
     @Autowired
     private UserService userService;
@@ -39,17 +49,56 @@ public class UserController {
         String username = request.get("username");
         String password = request.get("password");
 
-        authenticationManager.authenticate(
-                new UsernamePasswordAuthenticationToken(username, password)
-        );
+        // 1️⃣ Kiểm tra user có tồn tại không
+        User user = userService.findUserByUsername(username)
+                .orElse(null);
 
-        UserDetails userDetails = userDetailsService.loadUserByUsername(username);
+        if (user == null) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                    .body(Map.of(
+                            "success", false,
+                            "message", "Sai username hoặc password!"
+                    ));
+        }
+
+        // 2️⃣ Kiểm tra password đúng không
+        try {
+            authenticationManager.authenticate(
+                    new UsernamePasswordAuthenticationToken(username, password)
+            );
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                    .body(Map.of(
+                            "success", false,
+                            "message", "Sai username hoặc password!"
+                    ));
+        }
+
+        // 3️⃣ Kiểm tra tài khoản có bị khóa không
+        if (!"ACTIVE".equalsIgnoreCase(user.getStatus())) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN)
+                    .body(Map.of(
+                            "success", false,
+                            "message", "Tài khoản đã bị khóa!"
+                    ));
+        }
+
+        // 4️⃣ Kiểm tra Admin duyệt chưa
+        if (user.getIsActive() == null || !user.getIsActive()) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN)
+                    .body(Map.of(
+                            "success", false,
+                            "message", "Tài khoản chưa được Admin duyệt!"
+                    ));
+        }
+
+        // 5️⃣ Tạo token
         String token = jwtService.generateToken(username);
 
         return ResponseEntity.ok(Map.of(
                 "success", true,
                 "token", token,
-                "username", username
+                "user", user
         ));
     }
 
@@ -97,9 +146,29 @@ public class UserController {
         }
 
         String username = authentication.getName();
-        User user = userService.findUserByUsername(username).get();
+
+        User user = userService.findUserByUsername(username)
+                .orElseThrow(() -> new RuntimeException("User không tồn tại"));
+
+        //  Nếu user chưa có mã nạp tiền → tạo ngay
+        if (user.getTopupCode() == null || user.getTopupCode().trim().isEmpty()) {
+            String topupCode = "C0525G1" + user.getId();  // Mã gọn nhẹ
+            user.setTopupCode(topupCode);
+            userService.save(user); // Lưu lại DB
+        }
 
         return ResponseEntity.ok(user);
     }
 
+    @GetMapping("/service/{userId}")
+    public ResponseEntity<?> getUserServices(@PathVariable Long userId) {
+        try {
+            List<CcdvServiceDetail> details = serviceDetailService.getServicesByUser(userId);
+            return ResponseEntity.ok(details);
+        } catch (Exception e) {
+            return ResponseEntity
+                    .status(HttpStatus.BAD_REQUEST)
+                    .body("❌ Lỗi khi lấy danh sách dịch vụ: " + e.getMessage());
+        }
+    }
 }

@@ -6,6 +6,8 @@ import jakarta.validation.constraints.*;
 import lombok.AllArgsConstructor;
 import lombok.NoArgsConstructor;
 
+import java.time.LocalDateTime;
+
 @Getter
 @Setter
 @AllArgsConstructor
@@ -17,6 +19,9 @@ public class User {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+
+    private String topupCode;
+
 
     @Column(unique = true, nullable = false, length = 50)
     @NotBlank(message = "username không được để trống")
@@ -57,4 +62,28 @@ public class User {
     @ManyToOne
     @JoinColumn(name = "role_id", nullable = false)
     private Role role;
+
+
+    @Column(name = "view_count")
+    private Integer viewCount = 0;
+
+
+    @Column(length = 20, nullable = false)
+    private String status = "ACTIVE";
+
+    // thêm trường isActive để xác định tài khoản đã được admin duyệt hay chưa
+    @Column(name = "is_active")
+    private Boolean isActive = false;
+
+    // thêm trường vip cho tài khoản
+    @Column(name = "is_vip")
+    private Boolean isVip = false;
+
+    // thêm trường lastActivity trạng thái của user
+    @Column(name = "last_activity")
+    private LocalDateTime lastActivity;
+    @Column(name = "is_online")
+    private Boolean isOnline = false;
+
+
 }

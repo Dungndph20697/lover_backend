@@ -1,8 +1,8 @@
 package com.codegym.model;
 
+import com.codegym.model.enums.ProfileStatus;
 import jakarta.persistence.*;
 import lombok.*;
-import org.springframework.web.multipart.MultipartFile;
 
 import java.time.LocalDateTime;
 
@@ -82,4 +82,14 @@ public class CcdvProfile {
     @Column(name = "hire_count")
     private Integer hireCount;
 
+    @Enumerated(EnumType.STRING)
+    @Column(length = 20, nullable = false)
+    private ProfileStatus status = ProfileStatus.ACTIVE; // mặc định là ACTIVE
+
+    // --- TRƯỜNG MỚI: setvip cho người ccdv
+    @Column(name = "vip", nullable = false)
+    private Boolean vip = false;
+
+    @Column(name = "vip_start_time")
+    private LocalDateTime vipStartTime;
 }

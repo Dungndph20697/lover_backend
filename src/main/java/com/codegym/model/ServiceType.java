@@ -24,4 +24,8 @@ public class ServiceType {
 
     private BigDecimal pricePerHour;
 
+    // service thuộc về CCDV (User)
+    @ManyToOne
+    @JoinColumn(name = "ccdv_id")
+    private User ccdv;
 }
